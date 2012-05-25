@@ -1,0 +1,560 @@
+Description: Upstream changes introduced in version 1.10.2-6.1ubuntu1
+ This patch has been created by dpkg-source during the package build.
+ Here's the last changelog entry, hopefully it gives details on why
+ those changes were made:
+ .
+ cairo (1.10.2-6.1ubuntu1) precise; urgency=low
+ .
+   * disable-flto-for-gcc-4.6: replaced with the debian version
+ .
+ The person named in the Author field signed this changelog entry.
+Author: Sebastien Bacher <seb128@ubuntu.com>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- cairo-1.10.2.orig/configure
++++ cairo-1.10.2/configure
+@@ -748,6 +748,8 @@ ac_subst_vars='am__EXEEXT_FALSE
+ am__EXEEXT_TRUE
+ LTLIBOBJS
+ LIBOBJS
++CAIRO_HAS_PERF_UTILS_FALSE
++CAIRO_HAS_PERF_UTILS_TRUE
+ HAVE_GTK_FALSE
+ HAVE_GTK_TRUE
+ gtk_LIBS
+@@ -1001,6 +1003,9 @@ build_cpu
+ build
+ AM_BACKSLASH
+ AM_DEFAULT_VERBOSITY
++MAINT
++MAINTAINER_MODE_FALSE
++MAINTAINER_MODE_TRUE
+ am__fastdepCC_FALSE
+ am__fastdepCC_TRUE
+ CCDEPMODE
+@@ -1085,6 +1090,7 @@ ac_subst_files=''
+ ac_user_opts='
+ enable_option_checking
+ enable_dependency_tracking
++enable_maintainer_mode
+ enable_silent_rules
+ enable_shared
+ enable_static
+@@ -1142,6 +1148,7 @@ enable_trace
+ enable_interpreter
+ enable_symbol_lookup
+ enable_some_floating_point
++enable_perf_utils
+ '
+       ac_precious_vars='build_alias
+ host_alias
+@@ -1831,6 +1838,8 @@ Optional Features:
+   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+   --disable-dependency-tracking  speeds up one-time build
+   --enable-dependency-tracking   do not reject slow dependency extractors
++  --enable-maintainer-mode  enable make rules and dependencies not useful
++			  (and sometimes confusing) to the casual installer
+   --enable-silent-rules          less verbose build output (undo: `make V=1')
+   --disable-silent-rules         verbose build output (undo: `make V=0')
+   --enable-shared[=PKGS]  build shared libraries [default=yes]
+@@ -1961,6 +1970,8 @@ Optional Features:
+                           option can improve performance on systems without a
+                           double precision floating-point unit, but might
+                           degrade performance on those that do.
++  --enable-perf-utils=[no/auto/yes]
++                          Enable cairo's cairo-perf-utils feature [default=no]
+ 
+ Optional Packages:
+   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+@@ -5199,6 +5210,29 @@ fi
+ 
+ 
+ 
++
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
++$as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
++    # Check whether --enable-maintainer-mode was given.
++if test "${enable_maintainer_mode+set}" = set; then :
++  enableval=$enable_maintainer_mode; USE_MAINTAINER_MODE=$enableval
++else
++  USE_MAINTAINER_MODE=no
++fi
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $USE_MAINTAINER_MODE" >&5
++$as_echo "$USE_MAINTAINER_MODE" >&6; }
++   if test $USE_MAINTAINER_MODE = yes; then
++  MAINTAINER_MODE_TRUE=
++  MAINTAINER_MODE_FALSE='#'
++else
++  MAINTAINER_MODE_TRUE='#'
++  MAINTAINER_MODE_FALSE=
++fi
++
++  MAINT=$MAINTAINER_MODE_TRUE
++
++
+ # Check whether --enable-silent-rules was given.
+ if test "${enable_silent_rules+set}" = set; then :
+   enableval=$enable_silent_rules;
+@@ -6063,13 +6097,13 @@ if test "${lt_cv_nm_interface+set}" = se
+ else
+   lt_cv_nm_interface="BSD nm"
+   echo "int some_variable = 0;" > conftest.$ac_ext
+-  (eval echo "\"\$as_me:6066: $ac_compile\"" >&5)
++  (eval echo "\"\$as_me:6100: $ac_compile\"" >&5)
+   (eval "$ac_compile" 2>conftest.err)
+   cat conftest.err >&5
+-  (eval echo "\"\$as_me:6069: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
++  (eval echo "\"\$as_me:6103: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
+   cat conftest.err >&5
+-  (eval echo "\"\$as_me:6072: output\"" >&5)
++  (eval echo "\"\$as_me:6106: output\"" >&5)
+   cat conftest.out >&5
+   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
+     lt_cv_nm_interface="MS dumpbin"
+@@ -7271,7 +7305,7 @@ ia64-*-hpux*)
+   ;;
+ *-*-irix6*)
+   # Find out which ABI we are using.
+-  echo '#line 7274 "configure"' > conftest.$ac_ext
++  echo '#line 7308 "configure"' > conftest.$ac_ext
+   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
+   (eval $ac_compile) 2>&5
+   ac_status=$?
+@@ -8531,11 +8565,11 @@ else
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:8534: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:8568: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>conftest.err)
+    ac_status=$?
+    cat conftest.err >&5
+-   echo "$as_me:8538: \$? = $ac_status" >&5
++   echo "$as_me:8572: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s "$ac_outfile"; then
+      # The compiler can only warn and ignore the option if not recognized
+      # So say no if there are warnings other than the usual output.
+@@ -8870,11 +8904,11 @@ else
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:8873: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:8907: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>conftest.err)
+    ac_status=$?
+    cat conftest.err >&5
+-   echo "$as_me:8877: \$? = $ac_status" >&5
++   echo "$as_me:8911: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s "$ac_outfile"; then
+      # The compiler can only warn and ignore the option if not recognized
+      # So say no if there are warnings other than the usual output.
+@@ -8975,11 +9009,11 @@ else
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:8978: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:9012: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>out/conftest.err)
+    ac_status=$?
+    cat out/conftest.err >&5
+-   echo "$as_me:8982: \$? = $ac_status" >&5
++   echo "$as_me:9016: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s out/conftest2.$ac_objext
+    then
+      # The compiler can only warn and ignore the option if not recognized
+@@ -9030,11 +9064,11 @@ else
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:9033: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:9067: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>out/conftest.err)
+    ac_status=$?
+    cat out/conftest.err >&5
+-   echo "$as_me:9037: \$? = $ac_status" >&5
++   echo "$as_me:9071: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s out/conftest2.$ac_objext
+    then
+      # The compiler can only warn and ignore the option if not recognized
+@@ -11414,7 +11448,7 @@ else
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 11417 "configure"
++#line 11451 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -11510,7 +11544,7 @@ else
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 11513 "configure"
++#line 11547 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -15595,11 +15629,11 @@ else
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:15598: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:15632: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>conftest.err)
+    ac_status=$?
+    cat conftest.err >&5
+-   echo "$as_me:15602: \$? = $ac_status" >&5
++   echo "$as_me:15636: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s "$ac_outfile"; then
+      # The compiler can only warn and ignore the option if not recognized
+      # So say no if there are warnings other than the usual output.
+@@ -15694,11 +15728,11 @@ else
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:15697: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:15731: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>out/conftest.err)
+    ac_status=$?
+    cat out/conftest.err >&5
+-   echo "$as_me:15701: \$? = $ac_status" >&5
++   echo "$as_me:15735: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s out/conftest2.$ac_objext
+    then
+      # The compiler can only warn and ignore the option if not recognized
+@@ -15746,11 +15780,11 @@ else
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:15749: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:15783: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>out/conftest.err)
+    ac_status=$?
+    cat out/conftest.err >&5
+-   echo "$as_me:15753: \$? = $ac_status" >&5
++   echo "$as_me:15787: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s out/conftest2.$ac_objext
+    then
+      # The compiler can only warn and ignore the option if not recognized
+@@ -17236,7 +17270,7 @@ MAYBE_WARN="-Wall -Wextra \
+ MAYBE_WARN="$MAYBE_WARN -erroff=E_ENUM_TYPE_MISMATCH_ARG \
+ 			-erroff=E_ENUM_TYPE_MISMATCH_OP"
+ 
+-MAYBE_WARN="$MAYBE_WARN -fno-strict-aliasing -fno-common -flto"
++MAYBE_WARN="$MAYBE_WARN -fno-strict-aliasing -fno-common"
+ 
+ MAYBE_WARN="$MAYBE_WARN -Wp,-D_FORTIFY_SOURCE=2"
+ 
+@@ -34814,6 +34848,219 @@ else
+ fi
+ 
+ 
++
++																	# Check whether --enable-perf-utils was given.
++if test "${enable_perf_utils+set}" = set; then :
++  enableval=$enable_perf_utils; enable_perf_utils=$enableval
++else
++  enable_perf_utils=no
++fi
++
++			case $enable_perf_utils in #(
++  no) :
++    		use_perf_utils="no (disabled, use --enable-perf-utils to enable)"
++	 ;; #(
++  	yes|auto) :
++    																																																																if test "x$cairo_cv_perf_utils_cache_version" != "x6" -o \
++			    "x$cairo_cv_perf_utils_cache_commands_len" != "x18" -o \
++			    "x$cairo_cv_perf_utils_cache_vars" != "x BASE REQUIRES CFLAGS NONPKGCONFIG_CFLAGS LIBS NONPKGCONFIG_LIBS NONPKGCONFIG_EXTRA_LIBS"; then :
++  unset cairo_cv_perf_utils_use
++fi
++		if test "x$enable_perf_utils" = xyes -a "x$cairo_cv_perf_utils_use" != xyes; then :
++  unset cairo_cv_perf_utils_use
++fi
++
++		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cairo's cairo-perf-utils feature" >&5
++$as_echo_n "checking for cairo's cairo-perf-utils feature... " >&6; }
++if test "${cairo_cv_perf_utils_use+set}" = set; then :
++  $as_echo_n "(cached) " >&6
++else
++  			echo
++			use_perf_utils=yes
++				perf_utils_BASE="cairo"
++perf_utils_REQUIRES="$ac_env_perf_utils_REQUIRES_value"
++perf_utils_CFLAGS="$ac_env_perf_utils_CFLAGS_value"
++perf_utils_NONPKGCONFIG_CFLAGS="$ac_env_perf_utils_NONPKGCONFIG_CFLAGS_value"
++perf_utils_LIBS="$ac_env_perf_utils_LIBS_value"
++perf_utils_NONPKGCONFIG_LIBS="$ac_env_perf_utils_NONPKGCONFIG_LIBS_value"
++perf_utils_NONPKGCONFIG_EXTRA_LIBS="$ac_env_perf_utils_NONPKGCONFIG_EXTRA_LIBS_value"
++
++			use_perf_utils=yes
++			cairo_cv_perf_utils_use=$use_perf_utils
++			cairo_cv_perf_utils_cache_vars=" BASE REQUIRES CFLAGS NONPKGCONFIG_CFLAGS LIBS NONPKGCONFIG_LIBS NONPKGCONFIG_EXTRA_LIBS"
++			cairo_cv_perf_utils_cache_commands_len="18"
++			cairo_cv_perf_utils_cache_version="6"
++				cairo_cv_perf_utils_BASE=$perf_utils_BASE
++cairo_cv_perf_utils_REQUIRES=$perf_utils_REQUIRES
++cairo_cv_perf_utils_CFLAGS=$perf_utils_CFLAGS
++cairo_cv_perf_utils_NONPKGCONFIG_CFLAGS=$perf_utils_NONPKGCONFIG_CFLAGS
++cairo_cv_perf_utils_LIBS=$perf_utils_LIBS
++cairo_cv_perf_utils_NONPKGCONFIG_LIBS=$perf_utils_NONPKGCONFIG_LIBS
++cairo_cv_perf_utils_NONPKGCONFIG_EXTRA_LIBS=$perf_utils_NONPKGCONFIG_EXTRA_LIBS
++
++			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether cairo's cairo-perf-utils feature could be enabled" >&5
++$as_echo_n "checking whether cairo's cairo-perf-utils feature could be enabled... " >&6; }
++
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cairo_cv_perf_utils_use" >&5
++$as_echo "$cairo_cv_perf_utils_use" >&6; }
++		use_perf_utils=$cairo_cv_perf_utils_use
++
++		if test "x$enable_perf_utils" = "xyes" -a "x$use_perf_utils" != xyes; then :
++  			as_fn_error $? " cairo-perf-utils feature could not be enabled" "$LINENO" 5
++
++fi	 ;; #(
++  *) :
++    			as_fn_error $? "invalid argument passed to --enable-perf-utils: \`$use_perf_utils', should be one of [no/auto/yes]" "$LINENO" 5
++	 ;;
++esac
++	if test "x$use_perf_utils" = "xyes"; then :
++  			perf_utils_BASE=$cairo_cv_perf_utils_BASE
++perf_utils_REQUIRES=$cairo_cv_perf_utils_REQUIRES
++perf_utils_CFLAGS=$cairo_cv_perf_utils_CFLAGS
++perf_utils_NONPKGCONFIG_CFLAGS=$cairo_cv_perf_utils_NONPKGCONFIG_CFLAGS
++perf_utils_LIBS=$cairo_cv_perf_utils_LIBS
++perf_utils_NONPKGCONFIG_LIBS=$cairo_cv_perf_utils_NONPKGCONFIG_LIBS
++perf_utils_NONPKGCONFIG_EXTRA_LIBS=$cairo_cv_perf_utils_NONPKGCONFIG_EXTRA_LIBS
++
++								        	CAIRO_REQUIRES="$perf_utils_REQUIRES"" ${CAIRO_REQUIRES}"
++
++							        	CAIRO_CFLAGS="$perf_utils_CFLAGS"" ${CAIRO_CFLAGS}"
++
++							        	CAIRO_NONPKGCONFIG_CFLAGS="$perf_utils_NONPKGCONFIG_CFLAGS"" ${CAIRO_NONPKGCONFIG_CFLAGS}"
++
++							        	CAIRO_LIBS="$perf_utils_LIBS"" ${CAIRO_LIBS}"
++
++							        	CAIRO_NONPKGCONFIG_LIBS="$perf_utils_NONPKGCONFIG_LIBS"" ${CAIRO_NONPKGCONFIG_LIBS}"
++
++
++else
++  					perf_utils_BASE=$cairo_cv_perf_utils_BASE
++perf_utils_REQUIRES=$cairo_cv_perf_utils_REQUIRES
++perf_utils_CFLAGS=$cairo_cv_perf_utils_CFLAGS
++perf_utils_NONPKGCONFIG_CFLAGS=$cairo_cv_perf_utils_NONPKGCONFIG_CFLAGS
++perf_utils_LIBS=$cairo_cv_perf_utils_LIBS
++perf_utils_NONPKGCONFIG_LIBS=$cairo_cv_perf_utils_NONPKGCONFIG_LIBS
++perf_utils_NONPKGCONFIG_EXTRA_LIBS=$cairo_cv_perf_utils_NONPKGCONFIG_EXTRA_LIBS
++
++
++fi
++
++							 if test "x$use_perf_utils" = xyes; then
++  CAIRO_HAS_PERF_UTILS_TRUE=
++  CAIRO_HAS_PERF_UTILS_FALSE='#'
++else
++  CAIRO_HAS_PERF_UTILS_TRUE='#'
++  CAIRO_HAS_PERF_UTILS_FALSE=
++fi
++
++
++										cr_make_tmp='CAIRO_HAS_PERF_UTILS=0'
++												        	CAIRO_MAKEFILE___WIN32="${CAIRO_MAKEFILE___WIN32}
++""$cr_make_tmp"
++
++
++										cr_make_tmp=''
++									        	CAIRO_MAKEFILE_cairo_AMAKE="${CAIRO_MAKEFILE_cairo_AMAKE}
++""$cr_make_tmp"
++
++												        	CAIRO_MAKEFILE_cairo_WIN32="${CAIRO_MAKEFILE_cairo_WIN32}
++""$cr_make_tmp"
++										cr_make_tmp=''
++									        	CAIRO_MAKEFILE_cairo_boilerplate_AMAKE="${CAIRO_MAKEFILE_cairo_boilerplate_AMAKE}
++""$cr_make_tmp"
++
++												        	CAIRO_MAKEFILE_cairo_boilerplate_WIN32="${CAIRO_MAKEFILE_cairo_boilerplate_WIN32}
++""$cr_make_tmp"
++
++
++
++
++
++
++										cr_make_tmp='all_cairo_private += $(cairo_perf_utils_private) $(cairo_perf_utils_headers)
++all_cairo_cxx_sources += $(cairo_perf_utils_cxx_sources)
++all_cairo_sources += $(cairo_perf_utils_sources)'
++									        	CAIRO_MAKEFILE_cairo_AMAKE="${CAIRO_MAKEFILE_cairo_AMAKE}
++""$cr_make_tmp"
++
++												        	CAIRO_MAKEFILE_cairo_WIN32="${CAIRO_MAKEFILE_cairo_WIN32}
++""$cr_make_tmp"
++										cr_make_tmp='all_cairo_boilerplate_private += $(cairo_boilerplate_perf_utils_private) $(cairo_boilerplate_perf_utils_headers)
++all_cairo_boilerplate_cxx_sources += $(cairo_boilerplate_perf_utils_cxx_sources)
++all_cairo_boilerplate_sources += $(cairo_boilerplate_perf_utils_sources)'
++									        	CAIRO_MAKEFILE_cairo_boilerplate_AMAKE="${CAIRO_MAKEFILE_cairo_boilerplate_AMAKE}
++""$cr_make_tmp"
++
++												        	CAIRO_MAKEFILE_cairo_boilerplate_WIN32="${CAIRO_MAKEFILE_cairo_boilerplate_WIN32}
++""$cr_make_tmp"
++
++
++										cr_make_tmp='enabled_cairo_private += $(cairo_perf_utils_private) $(cairo_perf_utils_headers)
++enabled_cairo_cxx_sources += $(cairo_perf_utils_cxx_sources)
++enabled_cairo_sources += $(cairo_perf_utils_sources)'
++								        	CAIRO_MAKEFILE_cairo_AMAKE="${CAIRO_MAKEFILE_cairo_AMAKE}
++"'if CAIRO_HAS_PERF_UTILS'
++			        	CAIRO_MAKEFILE_cairo_AMAKE="${CAIRO_MAKEFILE_cairo_AMAKE}
++""$cr_make_tmp"
++			        	CAIRO_MAKEFILE_cairo_AMAKE="${CAIRO_MAKEFILE_cairo_AMAKE}
++"'endif'
++
++											        	CAIRO_MAKEFILE_cairo_WIN32="${CAIRO_MAKEFILE_cairo_WIN32}
++"'ifeq ($(CAIRO_HAS_PERF_UTILS),1)'
++			        	CAIRO_MAKEFILE_cairo_WIN32="${CAIRO_MAKEFILE_cairo_WIN32}
++""$cr_make_tmp"
++			        	CAIRO_MAKEFILE_cairo_WIN32="${CAIRO_MAKEFILE_cairo_WIN32}
++"'endif'
++									cr_make_tmp='enabled_cairo_boilerplate_private += $(cairo_boilerplate_perf_utils_private) $(cairo_boilerplate_perf_utils_headers)
++enabled_cairo_boilerplate_cxx_sources += $(cairo_boilerplate_perf_utils_cxx_sources)
++enabled_cairo_boilerplate_sources += $(cairo_boilerplate_perf_utils_sources)'
++								        	CAIRO_MAKEFILE_cairo_boilerplate_AMAKE="${CAIRO_MAKEFILE_cairo_boilerplate_AMAKE}
++"'if CAIRO_HAS_PERF_UTILS'
++			        	CAIRO_MAKEFILE_cairo_boilerplate_AMAKE="${CAIRO_MAKEFILE_cairo_boilerplate_AMAKE}
++""$cr_make_tmp"
++			        	CAIRO_MAKEFILE_cairo_boilerplate_AMAKE="${CAIRO_MAKEFILE_cairo_boilerplate_AMAKE}
++"'endif'
++
++											        	CAIRO_MAKEFILE_cairo_boilerplate_WIN32="${CAIRO_MAKEFILE_cairo_boilerplate_WIN32}
++"'ifeq ($(CAIRO_HAS_PERF_UTILS),1)'
++			        	CAIRO_MAKEFILE_cairo_boilerplate_WIN32="${CAIRO_MAKEFILE_cairo_boilerplate_WIN32}
++""$cr_make_tmp"
++			        	CAIRO_MAKEFILE_cairo_boilerplate_WIN32="${CAIRO_MAKEFILE_cairo_boilerplate_WIN32}
++"'endif'
++
++
++
++
++
++
++
++
++
++					if test "x$use_perf_utils" = xyes; then :
++  :
++
++$as_echo "#define CAIRO_HAS_PERF_UTILS 1" >>confdefs.h
++
++
++
++fi
++										cr_make_tmp='	@echo "#define CAIRO_HAS_PERF_UTILS 1" >> src/cairo-features.h'
++											        	CAIRO_MAKEFILE_win32_features_h_WIN32="${CAIRO_MAKEFILE_win32_features_h_WIN32}
++"'ifeq ($(CAIRO_HAS_PERF_UTILS),1)'
++			        	CAIRO_MAKEFILE_win32_features_h_WIN32="${CAIRO_MAKEFILE_win32_features_h_WIN32}
++""$cr_make_tmp"
++			        	CAIRO_MAKEFILE_win32_features_h_WIN32="${CAIRO_MAKEFILE_win32_features_h_WIN32}
++"'endif'
++
++
++
++
++
++
++
++
++
+ ac_config_files="$ac_config_files Makefile boilerplate/Makefile src/Makefile test/Makefile test/pdiff/Makefile perf/Makefile util/Makefile util/cairo-fdr/Makefile util/cairo-gobject/Makefile util/cairo-script/Makefile util/cairo-script/examples/Makefile util/cairo-sphinx/Makefile util/cairo-trace/Makefile util/cairo-trace/cairo-trace doc/Makefile doc/public/Makefile"
+ 
+ 
+@@ -34931,6 +35178,10 @@ else
+   am__EXEEXT_FALSE=
+ fi
+ 
++if test -z "${MAINTAINER_MODE_TRUE}" && test -z "${MAINTAINER_MODE_FALSE}"; then
++  as_fn_error $? "conditional \"MAINTAINER_MODE\" was never defined.
++Usually this means the macro was only invoked conditionally." "$LINENO" 5
++fi
+ if test -z "${ENABLE_GTK_DOC_TRUE}" && test -z "${ENABLE_GTK_DOC_FALSE}"; then
+   as_fn_error $? "conditional \"ENABLE_GTK_DOC\" was never defined.
+ Usually this means the macro was only invoked conditionally." "$LINENO" 5
+@@ -35220,6 +35471,10 @@ if test -z "${HAVE_GTK_TRUE}" && test -z
+   as_fn_error $? "conditional \"HAVE_GTK\" was never defined.
+ Usually this means the macro was only invoked conditionally." "$LINENO" 5
+ fi
++if test -z "${CAIRO_HAS_PERF_UTILS_TRUE}" && test -z "${CAIRO_HAS_PERF_UTILS_FALSE}"; then
++  as_fn_error $? "conditional \"CAIRO_HAS_PERF_UTILS\" was never defined.
++Usually this means the macro was only invoked conditionally." "$LINENO" 5
++fi
+ 
+ : ${CONFIG_STATUS=./config.status}
+ ac_write_fail=0
+@@ -38789,6 +39044,7 @@ fi
+ 	echo "The following features and utilities:"
+ 	echo "  cairo-trace:                $use_trace"
+ 	echo "  cairo-script-interpreter:   $use_interpreter"
++	echo "  cairo-perf-utils:           $use_perf_utils"
+ 	echo ""
+ 	echo "And the following internal features:"
+ 	echo "  pthread:       $use_pthread"
+--- cairo-1.10.2.orig/aclocal.m4
++++ cairo-1.10.2/aclocal.m4
+@@ -587,6 +587,46 @@ fi
+ rmdir .tst 2>/dev/null
+ AC_SUBST([am__leading_dot])])
+ 
++# Add --enable-maintainer-mode option to configure.         -*- Autoconf -*-
++# From Jim Meyering
++
++# Copyright (C) 1996, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2008
++# Free Software Foundation, Inc.
++#
++# This file is free software; the Free Software Foundation
++# gives unlimited permission to copy and/or distribute it,
++# with or without modifications, as long as this notice is preserved.
++
++# serial 5
++
++# AM_MAINTAINER_MODE([DEFAULT-MODE])
++# ----------------------------------
++# Control maintainer-specific portions of Makefiles.
++# Default is to disable them, unless `enable' is passed literally.
++# For symmetry, `disable' may be passed as well.  Anyway, the user
++# can override the default with the --enable/--disable switch.
++AC_DEFUN([AM_MAINTAINER_MODE],
++[m4_case(m4_default([$1], [disable]),
++       [enable], [m4_define([am_maintainer_other], [disable])],
++       [disable], [m4_define([am_maintainer_other], [enable])],
++       [m4_define([am_maintainer_other], [enable])
++        m4_warn([syntax], [unexpected argument to AM@&t@_MAINTAINER_MODE: $1])])
++AC_MSG_CHECKING([whether to am_maintainer_other maintainer-specific portions of Makefiles])
++  dnl maintainer-mode's default is 'disable' unless 'enable' is passed
++  AC_ARG_ENABLE([maintainer-mode],
++[  --][am_maintainer_other][-maintainer-mode  am_maintainer_other make rules and dependencies not useful
++			  (and sometimes confusing) to the casual installer],
++      [USE_MAINTAINER_MODE=$enableval],
++      [USE_MAINTAINER_MODE=]m4_if(am_maintainer_other, [enable], [no], [yes]))
++  AC_MSG_RESULT([$USE_MAINTAINER_MODE])
++  AM_CONDITIONAL([MAINTAINER_MODE], [test $USE_MAINTAINER_MODE = yes])
++  MAINT=$MAINTAINER_MODE_TRUE
++  AC_SUBST([MAINT])dnl
++]
++)
++
++AU_DEFUN([jm_MAINTAINER_MODE], [AM_MAINTAINER_MODE])
++
+ # Check to see how 'make' treats includes.	            -*- Autoconf -*-
+ 
+ # Copyright (C) 2001, 2002, 2003, 2005, 2009  Free Software Foundation, Inc.

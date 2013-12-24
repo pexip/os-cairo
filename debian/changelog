@@ -1,3 +1,9 @@
+cairo (1.10.2-6.1ubuntu3pexip1) pexip; urgency=low
+
+  * Prepare Pexip packaging
+
+ -- John-Mark Bell <jmb@pexip.com>  Tue, 24 Dec 2013 13:34:05 +0000
+
 cairo (1.10.2-6.1ubuntu3) precise-proposed; urgency=low
 
   * debian/patches/git_support_weird_pixmap_formats.patch:

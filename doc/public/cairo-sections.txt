@@ -7,6 +7,10 @@ cairo_ft_font_face_create_for_pattern
 cairo_ft_font_options_substitute
 cairo_ft_scaled_font_lock_face
 cairo_ft_scaled_font_unlock_face
+cairo_ft_synthesize_t
+cairo_ft_font_face_get_synthesize
+cairo_ft_font_face_set_synthesize
+cairo_ft_font_face_unset_synthesize
 </SECTION>
 
 <SECTION>
@@ -106,6 +110,17 @@ cairo_ps_surface_dsc_comment
 CAIRO_HAS_RECORDING_SURFACE
 cairo_recording_surface_create
 cairo_recording_surface_ink_extents
+cairo_recording_surface_get_extents
+</SECTION>
+
+<SECTION>
+<FILE>cairo-skia</FILE>
+cairo_skia_context_t
+cairo_skia_surface_t
+format_to_sk_config
+<SUBSECTION Private>
+cairo_skia_context
+cairo_skia_surface
 </SECTION>
 
 <SECTION>
@@ -117,6 +132,19 @@ cairo_win32_surface_create_with_ddb
 cairo_win32_printing_surface_create
 cairo_win32_surface_get_dc
 cairo_win32_surface_get_image
+<SUBSECTION Private>
+SB_NONE
+SHADEBLENDCAPS
+WIN32_FONT_LOGICAL_SCALE
+cairo_win32_device_t
+cairo_win32_display_surface_t
+cairo_win32_printing_surface_t
+cairo_win32_surface_t
+to_win32_device
+to_win32_device_from_surface
+to_win32_display_surface
+to_win32_printing_surface
+to_win32_surface
 </SECTION>
 
 <SECTION>
@@ -125,9 +153,6 @@ CAIRO_HAS_QUARTZ_SURFACE
 cairo_quartz_surface_create
 cairo_quartz_surface_create_for_cg_context
 cairo_quartz_surface_get_cg_context
-<SUBSECTION Private>
-cairo_quartz_image_surface_create
-cairo_quartz_image_surface_get_image
 </SECTION>
 
 <SECTION>
@@ -144,6 +169,9 @@ cairo_xlib_surface_get_visual
 cairo_xlib_surface_get_width
 cairo_xlib_surface_get_height
 cairo_xlib_surface_get_depth
+cairo_xlib_device_debug_cap_xrender_version
+cairo_xlib_device_debug_get_precision
+cairo_xlib_device_debug_set_precision
 </SECTION>
 
 <SECTION>
@@ -154,6 +182,22 @@ cairo_xlib_surface_get_xrender_format
 </SECTION>
 
 <SECTION>
+<FILE>cairo-xcb</FILE>
+CAIRO_HAS_XCB_SURFACE
+CAIRO_HAS_XCB_SHM_FUNCTIONS
+cairo_xcb_surface_create
+cairo_xcb_surface_create_for_bitmap
+cairo_xcb_surface_create_with_xrender_format
+cairo_xcb_surface_set_size
+cairo_xcb_surface_set_drawable
+cairo_xcb_device_get_connection
+cairo_xcb_device_debug_cap_xrender_version
+cairo_xcb_device_debug_cap_xshm_version
+cairo_xcb_device_debug_get_precision
+cairo_xcb_device_debug_set_precision
+</SECTION>
+
+<SECTION>
 <FILE>cairo-svg</FILE>
 CAIRO_HAS_SVG_SURFACE
 cairo_svg_surface_create
@@ -161,7 +205,7 @@ cairo_svg_surface_create_for_stream
 cairo_svg_surface_restrict_to_version
 cairo_svg_version_t
 cairo_svg_get_versions
-cairo_svg_version_to_string 
+cairo_svg_version_to_string
 </SECTION>
 
 <SECTION>
@@ -179,17 +223,30 @@ cairo_device_set_user_data
 cairo_device_get_user_data
 cairo_device_acquire
 cairo_device_release
+cairo_device_observer_elapsed
+cairo_device_observer_fill_elapsed
+cairo_device_observer_glyphs_elapsed
+cairo_device_observer_mask_elapsed
+cairo_device_observer_paint_elapsed
+cairo_device_observer_print
+cairo_device_observer_stroke_elapsed
 </SECTION>
 
 <SECTION>
 <FILE>cairo-surface</FILE>
+CAIRO_HAS_MIME_SURFACE
+CAIRO_MIME_TYPE_JBIG2
+CAIRO_MIME_TYPE_JBIG2_GLOBAL
+CAIRO_MIME_TYPE_JBIG2_GLOBAL_ID
 CAIRO_MIME_TYPE_JP2
 CAIRO_MIME_TYPE_JPEG
 CAIRO_MIME_TYPE_PNG
 CAIRO_MIME_TYPE_URI
+CAIRO_MIME_TYPE_UNIQUE_ID
 cairo_surface_t
 cairo_content_t
 cairo_surface_create_similar
+cairo_surface_create_similar_image
 cairo_surface_create_for_rectangle
 cairo_surface_reference
 cairo_surface_destroy
@@ -203,6 +260,8 @@ cairo_surface_mark_dirty
 cairo_surface_mark_dirty_rectangle
 cairo_surface_set_device_offset
 cairo_surface_get_device_offset
+cairo_surface_get_device_scale
+cairo_surface_set_device_scale
 cairo_surface_set_fallback_resolution
 cairo_surface_get_fallback_resolution
 cairo_surface_type_t
@@ -215,6 +274,26 @@ cairo_surface_show_page
 cairo_surface_has_show_text_glyphs
 cairo_surface_set_mime_data
 cairo_surface_get_mime_data
+cairo_surface_supports_mime_type
+cairo_surface_map_to_image
+cairo_surface_unmap_image
+</SECTION>
+
+<SECTION>
+<FILE>cairo-surface-observer</FILE>
+CAIRO_HAS_OBSERVER_SURFACE
+cairo_surface_create_observer
+cairo_surface_observer_add_fill_callback
+cairo_surface_observer_add_finish_callback
+cairo_surface_observer_add_flush_callback
+cairo_surface_observer_add_glyphs_callback
+cairo_surface_observer_add_mask_callback
+cairo_surface_observer_add_paint_callback
+cairo_surface_observer_add_stroke_callback
+cairo_surface_observer_callback_t
+cairo_surface_observer_elapsed
+cairo_surface_observer_mode_t
+cairo_surface_observer_print
 </SECTION>
 
 <SECTION>
@@ -277,6 +356,19 @@ cairo_pattern_create_linear
 cairo_pattern_get_linear_points
 cairo_pattern_create_radial
 cairo_pattern_get_radial_circles
+cairo_pattern_create_mesh
+cairo_mesh_pattern_begin_patch
+cairo_mesh_pattern_end_patch
+cairo_mesh_pattern_move_to
+cairo_mesh_pattern_line_to
+cairo_mesh_pattern_curve_to
+cairo_mesh_pattern_set_control_point
+cairo_mesh_pattern_set_corner_color_rgb
+cairo_mesh_pattern_set_corner_color_rgba
+cairo_mesh_pattern_get_patch_count
+cairo_mesh_pattern_get_path
+cairo_mesh_pattern_get_control_point
+cairo_mesh_pattern_get_corner_color_rgba
 cairo_pattern_reference
 cairo_pattern_destroy
 cairo_pattern_status
@@ -293,6 +385,26 @@ cairo_pattern_get_type
 cairo_pattern_get_reference_count
 cairo_pattern_set_user_data
 cairo_pattern_get_user_data
+</SECTION>
+
+<SECTION>
+<FILE>cairo-raster-source</FILE>
+cairo_pattern_create_raster_source
+cairo_raster_source_pattern_set_callback_data
+cairo_raster_source_pattern_get_callback_data
+cairo_raster_source_pattern_set_acquire
+cairo_raster_source_pattern_get_acquire
+cairo_raster_source_pattern_set_snapshot
+cairo_raster_source_pattern_get_snapshot
+cairo_raster_source_pattern_set_copy
+cairo_raster_source_pattern_get_copy
+cairo_raster_source_pattern_set_finish
+cairo_raster_source_pattern_get_finish
+cairo_raster_source_acquire_func_t
+cairo_raster_source_release_func_t
+cairo_raster_source_snapshot_func_t
+cairo_raster_source_copy_func_t
+cairo_raster_source_finish_func_t
 </SECTION>
 
 <SECTION>
@@ -603,4 +715,18 @@ cairo_get_status_string
 cairo_status_string
 CAIRO_FONT_TYPE_ATSUI
 cairo_atsui_font_face_create_for_atsu_font_id
+</SECTION>
+
+<SECTION>
+<FILE>cairo-script</FILE>
+CAIRO_HAS_SCRIPT_SURFACE
+cairo_script_create
+cairo_script_create_for_stream
+cairo_script_from_recording_surface
+cairo_script_get_mode
+cairo_script_mode_t
+cairo_script_set_mode
+cairo_script_surface_create
+cairo_script_surface_create_for_target
+cairo_script_write_comment
 </SECTION>

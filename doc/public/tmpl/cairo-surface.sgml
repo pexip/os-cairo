@@ -20,6 +20,34 @@ cairo-surface
 <!-- ##### SECTION Image ##### -->
 
 
+<!-- ##### MACRO CAIRO_HAS_MIME_SURFACE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO CAIRO_MIME_TYPE_JBIG2 ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO CAIRO_MIME_TYPE_JBIG2_GLOBAL ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO CAIRO_MIME_TYPE_JBIG2_GLOBAL_ID ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### MACRO CAIRO_MIME_TYPE_JP2 ##### -->
 <para>
 
@@ -48,6 +76,13 @@ cairo-surface
 
 
 
+<!-- ##### MACRO CAIRO_MIME_TYPE_UNIQUE_ID ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### TYPEDEF cairo_surface_t ##### -->
 <para>
 
@@ -70,6 +105,18 @@ cairo-surface
 
 @other: 
 @content: 
+@width: 
+@height: 
+@Returns: 
+
+
+<!-- ##### FUNCTION cairo_surface_create_similar_image ##### -->
+<para>
+
+</para>
+
+@other: 
+@format: 
 @width: 
 @height: 
 @Returns: 
@@ -197,6 +244,26 @@ cairo-surface
 @y_offset: 
 
 
+<!-- ##### FUNCTION cairo_surface_get_device_scale ##### -->
+<para>
+
+</para>
+
+@surface: 
+@x_scale: 
+@y_scale: 
+
+
+<!-- ##### FUNCTION cairo_surface_set_device_scale ##### -->
+<para>
+
+</para>
+
+@surface: 
+@x_scale: 
+@y_scale: 
+
+
 <!-- ##### FUNCTION cairo_surface_set_fallback_resolution ##### -->
 <para>
 
@@ -246,6 +313,7 @@ cairo-surface
 @CAIRO_SURFACE_TYPE_XML: 
 @CAIRO_SURFACE_TYPE_SKIA: 
 @CAIRO_SURFACE_TYPE_SUBSURFACE: 
+@CAIRO_SURFACE_TYPE_COGL: 
 
 <!-- ##### FUNCTION cairo_surface_get_type ##### -->
 <para>
@@ -335,5 +403,34 @@ cairo-surface
 @mime_type: 
 @data: 
 @length: 
+
+
+<!-- ##### FUNCTION cairo_surface_supports_mime_type ##### -->
+<para>
+
+</para>
+
+@surface: 
+@mime_type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION cairo_surface_map_to_image ##### -->
+<para>
+
+</para>
+
+@surface: 
+@extents: 
+@Returns: 
+
+
+<!-- ##### FUNCTION cairo_surface_unmap_image ##### -->
+<para>
+
+</para>
+
+@surface: 
+@image: 
 
 

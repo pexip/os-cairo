@@ -1,142 +1,64 @@
-<!-- ##### SECTION ./tmpl/cairo-atsui.sgml:Long_Description ##### -->
+<!-- ##### MACRO CAIRO_HAS_EGL_FUNCTIONS ##### -->
 <para>
-The ATSUI font backend is primarily used to render text on Apple OS X systems.
+
 </para>
 
 
-<!-- ##### SECTION ./tmpl/cairo-atsui.sgml:See_Also ##### -->
+<!-- ##### MACRO CAIRO_HAS_GLX_FUNCTIONS ##### -->
 <para>
-<itemizedlist>
-<listitem>#cairo_font_face_t</listitem>
-</itemizedlist>
+
 </para>
 
 
-<!-- ##### SECTION ./tmpl/cairo-atsui.sgml:Short_Description ##### -->
-Font support for ATSUI on OS X
-
-
-<!-- ##### SECTION ./tmpl/cairo-atsui.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/cairo-atsui.sgml:Title ##### -->
-ATSUI Fonts
-
-
-<!-- ##### SECTION ./tmpl/cairo-beos.sgml:Long_Description ##### -->
+<!-- ##### MACRO CAIRO_HAS_GOBJECT_FUNCTIONS ##### -->
 <para>
-The BeOS surface is used to render cairo graphics to
-BeOS views and bitmaps.
+
 </para>
 
 
-<!-- ##### SECTION ./tmpl/cairo-beos.sgml:See_Also ##### -->
+<!-- ##### MACRO CAIRO_HAS_WGL_FUNCTIONS ##### -->
 <para>
-<itemizedlist>
-<listitem>#cairo_surface_t</listitem>
-</itemizedlist>
+
 </para>
 
 
-<!-- ##### SECTION ./tmpl/cairo-beos.sgml:Short_Description ##### -->
-BeOS surface support
-
-
-<!-- ##### SECTION ./tmpl/cairo-beos.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/cairo-beos.sgml:Title ##### -->
-BeOS Surfaces
-
-
-<!-- ##### SECTION ./tmpl/cairo-glitz.sgml:Long_Description ##### -->
+<!-- ##### FUNCTION cairo_quartz_image_surface_create ##### -->
 <para>
-The Glitz surface is used to render cairo graphics targeting the
-OpenGL hardware using the Glitz library.
+
 </para>
 
+@image_surface: 
+@Returns: 
 
-<!-- ##### SECTION ./tmpl/cairo-glitz.sgml:See_Also ##### -->
+<!-- ##### FUNCTION cairo_quartz_image_surface_get_image ##### -->
 <para>
-<itemizedlist>
-<listitem>#cairo_surface_t</listitem>
-</itemizedlist>
+
 </para>
 
+@surface: 
+@Returns: 
 
-<!-- ##### SECTION ./tmpl/cairo-glitz.sgml:Short_Description ##### -->
-OpenGL accelerated rendering using the Glitz library
-
-
-<!-- ##### SECTION ./tmpl/cairo-glitz.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/cairo-glitz.sgml:Title ##### -->
-Glitz Surfaces
-
-
-<!-- ##### SECTION ./tmpl/cairo-xcb-xrender.sgml:Long_Description ##### -->
+<!-- ##### STRUCT cairo_skia_context ##### -->
 <para>
-The XCB surface is used to render cairo graphics to X Window System
-windows and pixmaps using the XCB library and its X Render extension.
-</para>
-<para>
-Note that the XCB surface automatically takes advantage of the X Render
-extension if it is available.
+
 </para>
 
+@base: 
+@original: 
+@target: 
+@matrix: 
+@canvas: 
+@paint: 
+@path: 
+@source: 
+@source_image: 
+@source_extra: 
 
-<!-- ##### SECTION ./tmpl/cairo-xcb-xrender.sgml:See_Also ##### -->
+<!-- ##### STRUCT cairo_skia_surface ##### -->
 <para>
-<itemizedlist>
-<listitem>#cairo_surface_t</listitem>
-</itemizedlist>
+
 </para>
 
-
-<!-- ##### SECTION ./tmpl/cairo-xcb-xrender.sgml:Short_Description ##### -->
-X Window System rendering using the XCB library and the X Render extension
-
-
-<!-- ##### SECTION ./tmpl/cairo-xcb-xrender.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/cairo-xcb-xrender.sgml:Title ##### -->
-XCB Surfaces
-
-
-<!-- ##### SECTION ./tmpl/cairo-xcb.sgml:Long_Description ##### -->
-<para>
-The XCB surface is used to render cairo graphics to X Window System
-windows and pixmaps using the XCB library.
-</para>
-<para>
-Note that the XCB surface automatically takes advantage of the X render
-extension if it is available.
-</para>
-
-
-<!-- ##### SECTION ./tmpl/cairo-xcb.sgml:See_Also ##### -->
-<para>
-<itemizedlist>
-<listitem>#cairo_surface_t</listitem>
-</itemizedlist>
-</para>
-
-
-<!-- ##### SECTION ./tmpl/cairo-xcb.sgml:Short_Description ##### -->
-X Window System rendering using the XCB library
-
-
-<!-- ##### SECTION ./tmpl/cairo-xcb.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/cairo-xcb.sgml:Title ##### -->
-XCB Surfaces
-
+@image: 
+@bitmap: 
 

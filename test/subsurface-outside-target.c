@@ -26,8 +26,6 @@
 
 #include "cairo-test.h"
 
-#define ARRAY_LENGTH(array) (sizeof (array) / sizeof ((array)[0]))
-
 #define TARGET_SIZE 10
 
 #define SUB_SIZE 15
@@ -173,7 +171,7 @@ draw (cairo_t *cr, int width, int height)
 CAIRO_TEST (subsurface_outside_target,
 	    "Tests contents of subsurfaces outside target area",
 	    "subsurface, pad", /* keywords */
-	    NULL, /* requirements */
+	    "target=raster", /* FIXME! recursion bug in subsurface/snapshot (with pdf backend) */ /* requirements */
 	    (PAINT_SIZE + TARGET_SIZE) * N_PADS         - TARGET_SIZE,
             (PAINT_SIZE + TARGET_SIZE) * N_CONTENTS * 2 - TARGET_SIZE,
 	    NULL, draw)

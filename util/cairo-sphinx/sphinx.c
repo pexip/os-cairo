@@ -1,3 +1,11 @@
+/*
+ * The intention for sphinx is for detection of rendering errors inside
+ * applications by simultaneously rendering on to the target device and on
+ * an image surface and comparing the two. If it found a discrepancy, it
+ * would then dump the trace that reproduces the error. (Then apply
+ * delta-debugging to reduce that down to a minimal trace.)
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -1378,7 +1386,7 @@ do_client (int fd,
 
     client.surface = client.target->create_surface (NULL, content, 1, 1, 1, 1,
 						    CAIRO_BOILERPLATE_MODE_TEST,
-						    0, &closure);
+						    &closure);
     if (client.surface == NULL) {
 	fprintf (stderr, "Failed to create target surface: %s.\n",
 		 client.target->name);

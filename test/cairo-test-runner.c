@@ -35,10 +35,7 @@
 
 #include <pixman.h> /* for version information */
 
-/* Coregraphics doesn't seem to like being forked and reports:
- * "The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec()."
- * so we don't for on OS X */
-#define SHOULD_FORK HAVE_FORK && HAVE_WAITPID && !__APPLE__
+#define SHOULD_FORK HAVE_FORK && HAVE_WAITPID
 #if SHOULD_FORK
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -72,6 +69,7 @@ typedef struct _cairo_test_runner {
     cairo_test_context_t base;
 
     unsigned int num_device_offsets;
+    unsigned int num_device_scales;
 
     cairo_bool_t passed;
     int num_passed;
@@ -107,7 +105,7 @@ typedef enum {
     GT
 } cairo_test_compare_op_t;
 
-static cairo_test_t *tests;
+static cairo_test_list_t *tests;
 
 static void CAIRO_BOILERPLATE_PRINTF_FORMAT(2,3)
 _log (cairo_test_context_t *ctx,
@@ -165,12 +163,9 @@ _list_free (cairo_test_list_t *list)
 static cairo_bool_t
 is_running_under_debugger (void)
 {
+#if HAVE_UNISTD_H && HAVE_LIBGEN_H && __linux__
     char buf[1024];
 
-    if (RUNNING_ON_VALGRIND)
-	return TRUE;
-
-#if HAVE_UNISTD_H && HAVE_LIBGEN_H && __linux__
     sprintf (buf, "/proc/%d/exe", getppid ());
     if (readlink (buf, buf, sizeof (buf)) != -1 &&
 	strncmp (basename (buf), "gdb", 3) == 0)
@@ -178,6 +173,9 @@ is_running_under_debugger (void)
 	return TRUE;
     }
 #endif
+
+    if (RUNNING_ON_VALGRIND)
+	return TRUE;
 
     return FALSE;
 }
@@ -235,7 +233,7 @@ _cairo_test_runner_draw (cairo_test_runner_t *runner,
 			 cairo_test_context_t *ctx,
 			 const cairo_boilerplate_target_t *target,
 			 cairo_bool_t similar,
-			 int device_offset)
+			 int device_offset, int device_scale)
 {
 #if SHOULD_FORK
     if (! runner->foreground) {
@@ -247,7 +245,7 @@ _cairo_test_runner_draw (cairo_test_runner_t *runner,
 
 	case 0: /* child */
 	    exit (_cairo_test_context_run_for_target (ctx, target,
-						      similar, device_offset));
+						      similar, device_offset, device_scale));
 
 	default:
 	    return _cairo_test_wait (pid);
@@ -255,7 +253,7 @@ _cairo_test_runner_draw (cairo_test_runner_t *runner,
     }
 #endif
     return _cairo_test_context_run_for_target (ctx, target,
-					       similar, device_offset);
+					       similar, device_offset, device_scale);
 }
 
 static void
@@ -268,6 +266,7 @@ append_argv (int *argc, char ***argv, const char *str)
     int olen;
     int len;
     int i;
+    int args_to_add = 0;
 
     if (str == NULL)
 	return;
@@ -278,9 +277,9 @@ append_argv (int *argc, char ***argv, const char *str)
     doit = FALSE;
     do {
 	if (doit)
-	    *argv = xmalloc (sizeof (char *) * (1 + *argc) + olen);
+	    *argv = xmalloc (olen);
 
-	olen = sizeof (char *) * (1 + *argc);
+	olen = sizeof (char *) * (args_to_add + *argc);
 	for (i = 0; i < old_argc; i++) {
 	    len = strlen (old_argv[i]) + 1;
 	    if (doit) {
@@ -298,7 +297,10 @@ append_argv (int *argc, char ***argv, const char *str)
 		    (*argv)[i] = (char *) *argv + olen;
 		    memcpy ((*argv)[i], s, len);
 		    (*argv)[i][len] = '\0';
+		} else {
+		    olen += sizeof (char *);
 		}
+		args_to_add++;
 		olen += len + 1;
 		i++;
 	    }
@@ -309,13 +311,15 @@ append_argv (int *argc, char ***argv, const char *str)
 	    if (doit) {
 		(*argv)[i] = (char *) *argv + olen;
 		memcpy ((*argv)[i], s, len);
+	    } else {
+		olen += sizeof (char *);
 	    }
+	    args_to_add++;
 	    olen += len;
 	    i++;
 	}
     } while (doit++ == FALSE);
-    (*argv)[i] = NULL;
-    *argc += i;
+    *argc = i;
 }
 
 static void
@@ -323,7 +327,6 @@ usage (const char *argv0)
 {
     fprintf (stderr,
 	     "Usage: %s [-afkxsl] [test-names|keywords ...]\n"
-	     "       %s -l\n"
 	     "\n"
 	     "Run the cairo conformance test suite over the given tests (all by default)\n"
 	     "The command-line arguments are interpreted as follows:\n"
@@ -332,15 +335,15 @@ usage (const char *argv0)
 	     "          skips similar surface and device offset testing.\n"
 	     "  -f	foreground; do not fork\n"
 	     "  -k	match tests by keyword\n"
+	     "  -l	list only; just list selected test case names without executing\n"
 	     "  -s	include slow, long running tests\n"
 	     "  -x	exit on first failure\n"
-	     "  -l	list only; just list selected test case names without executing\n"
 	     "\n"
 	     "If test names are given they are used as matches either to a specific\n"
 	     "test case or to a keyword, so a command such as\n"
-	     "\"cairo-test-suite -k text\" can be used to run all text test cases, and\n"
-	     "\"cairo-test-suite text-transform\" to run the individual case.\n",
-	     argv0, argv0);
+	     "\"%s -k text\" can be used to run all text test cases, and\n"
+	     "\"%s text-transform\" to run the individual case.\n",
+	     argv0, argv0, argv0);
 }
 
 static void
@@ -349,28 +352,28 @@ _parse_cmdline (cairo_test_runner_t *runner, int *argc, char **argv[])
     int c;
 
     while (1) {
-	c = _cairo_getopt (*argc, *argv, ":afkxsl");
+	c = _cairo_getopt (*argc, *argv, ":afklsx");
 	if (c == -1)
 	    break;
 
 	switch (c) {
 	case 'a':
-	    runner->full_test = TRUE;
-	    break;
-	case 's':
-	    runner->slow = TRUE;
-	    break;
-	case 'l':
-	    runner->list_only = TRUE;
+	    runner->full_test = ~0;
 	    break;
 	case 'f':
 	    runner->foreground = TRUE;
 	    break;
-	case 'x':
-	    runner->exit_on_failure = TRUE;
-	    break;
 	case 'k':
 	    runner->keyword_match = TRUE;
+	    break;
+	case 'l':
+	    runner->list_only = TRUE;
+	    break;
+	case 's':
+	    runner->slow = TRUE;
+	    break;
+	case 'x':
+	    runner->exit_on_failure = TRUE;
 	    break;
 	default:
 	    fprintf (stderr, "Internal error: unhandled option: %c\n", c);
@@ -388,7 +391,7 @@ _parse_cmdline (cairo_test_runner_t *runner, int *argc, char **argv[])
 static void
 _runner_init (cairo_test_runner_t *runner)
 {
-    cairo_test_init (&runner->base, "cairo-test-suite");
+    cairo_test_init (&runner->base, "cairo-test-suite", ".");
 
     runner->passed = TRUE;
 
@@ -688,15 +691,19 @@ _has_required_rsvg_version (const char *str)
     return TRUE;
 }
 
+#define TEST_SIMILAR	0x1
+#define TEST_OFFSET	0x2
+#define TEST_SCALE	0x4
 int
 main (int argc, char **argv)
 {
     cairo_test_runner_t runner;
-    cairo_test_t *test;
+    cairo_test_list_t *test_list;
     cairo_test_status_t *target_status;
-    unsigned int n, m;
+    unsigned int n, m, k;
     char targets[4096];
     int len;
+    char *cairo_tests_env;
 
 #ifdef _MSC_VER
     /* We don't want an assert dialog, we want stderr */
@@ -705,9 +712,11 @@ main (int argc, char **argv)
 #endif
 
     _cairo_test_runner_register_tests ();
+    tests = _list_reverse (tests);
 
     memset (&runner, 0, sizeof (runner));
     runner.num_device_offsets = 1;
+    runner.num_device_scales = 1;
 
     if (is_running_under_debugger ())
 	runner.foreground = TRUE;
@@ -716,7 +725,16 @@ main (int argc, char **argv)
 	const char *env = getenv ("CAIRO_TEST_MODE");
 
 	if (strstr (env, "full")) {
-	    runner.full_test = TRUE;
+	    runner.full_test = ~0;
+	}
+	if (strstr (env, "similar")) {
+	    runner.full_test |= TEST_SIMILAR;
+	}
+	if (strstr (env, "offset")) {
+	    runner.full_test |= TEST_OFFSET;
+	}
+	if (strstr (env, "scale")) {
+	    runner.full_test |= TEST_SCALE;
 	}
 	if (strstr (env, "foreground")) {
 	    runner.foreground = TRUE;
@@ -733,10 +751,15 @@ main (int argc, char **argv)
     }
 
     _parse_cmdline (&runner, &argc, &argv);
-    append_argv (&argc, &argv, getenv ("CAIRO_TESTS"));
 
-    if (runner.full_test) {
+    cairo_tests_env = getenv("CAIRO_TESTS");
+    append_argv (&argc, &argv, cairo_tests_env);
+
+    if (runner.full_test & TEST_OFFSET) {
 	runner.num_device_offsets = 2;
+    }
+    if (runner.full_test & TEST_SCALE) {
+	runner.num_device_scales = 2;
     }
 
     target_status = NULL; /* silence the compiler */
@@ -747,7 +770,8 @@ main (int argc, char **argv)
 				 runner.base.num_targets);
     }
 
-    for (test = tests; test != NULL; test = test->next) {
+    for (test_list = tests; test_list != NULL; test_list = test_list->next) {
+	const cairo_test_t *test = test_list->test;
 	cairo_test_context_t ctx;
 	cairo_test_status_t status;
 	cairo_bool_t failed = FALSE, xfailed = FALSE, error = FALSE, crashed = FALSE, skipped = TRUE;
@@ -896,40 +920,43 @@ main (int argc, char **argv)
 			 target_error = FALSE,
 			 target_crashed = FALSE,
 			 target_skipped = TRUE;
-	    int has_similar;
+	    cairo_test_similar_t has_similar;
 
 	    target = ctx.targets_to_test[n];
 
-	    has_similar = runner.full_test ?
+	    has_similar = runner.full_test & TEST_SIMILAR ?
 			  cairo_test_target_has_similar (&ctx, target) :
-		          0;
+			  DIRECT;
 	    for (m = 0; m < runner.num_device_offsets; m++) {
-		int dev_offset = m * 25;
-		int similar;
+		for (k = 0; k < runner.num_device_scales; k++) {
+		    int dev_offset = m * 25;
+		    int dev_scale = k + 1;
+		    cairo_test_similar_t similar;
 
-		for (similar = 0; similar <= has_similar; similar++) {
-		    status = _cairo_test_runner_draw (&runner, &ctx, target,
-						      similar, dev_offset);
-		    switch (status) {
-		    case CAIRO_TEST_SUCCESS:
-			target_skipped = FALSE;
-			break;
-		    case CAIRO_TEST_XFAILURE:
-			target_xfailed = TRUE;
-			break;
-		    case CAIRO_TEST_NEW:
-		    case CAIRO_TEST_FAILURE:
-			target_failed = TRUE;
-			break;
-		    case CAIRO_TEST_ERROR:
-			target_error = TRUE;
-			break;
-		    case CAIRO_TEST_NO_MEMORY:
-		    case CAIRO_TEST_CRASHED:
-			target_crashed = TRUE;
-			break;
-		    case CAIRO_TEST_UNTESTED:
-			break;
+		    for (similar = DIRECT; similar <= has_similar; similar++) {
+			status = _cairo_test_runner_draw (&runner, &ctx, target,
+							  similar, dev_offset, dev_scale);
+			switch (status) {
+			case CAIRO_TEST_SUCCESS:
+			    target_skipped = FALSE;
+			    break;
+			case CAIRO_TEST_XFAILURE:
+			    target_xfailed = TRUE;
+			    break;
+			case CAIRO_TEST_NEW:
+			case CAIRO_TEST_FAILURE:
+			    target_failed = TRUE;
+			    break;
+			case CAIRO_TEST_ERROR:
+			    target_error = TRUE;
+			    break;
+			case CAIRO_TEST_NO_MEMORY:
+			case CAIRO_TEST_CRASHED:
+			    target_crashed = TRUE;
+			    break;
+			case CAIRO_TEST_UNTESTED:
+			    break;
+			}
 		    }
 		}
 	    }
@@ -1053,6 +1080,9 @@ main (int argc, char **argv)
 
     }
 
+    if (cairo_tests_env)
+	free(argv);
+
     if (runner.list_only) {
 	printf ("\n");
 	return CAIRO_TEST_SUCCESS;
@@ -1073,6 +1103,5 @@ main (int argc, char **argv)
 void
 cairo_test_register (cairo_test_t *test)
 {
-    test->next = tests;
-    tests = test;
+    tests = _list_prepend (tests, test);
 }

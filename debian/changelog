@@ -1,3 +1,10 @@
+cairo (1.10.2-6.1ubuntu3pexip2) pexip; urgency=low
+
+  * SECURITY UPDATE: buffer overflow in MakeBigReq
+    - debian/control: change Build-Depends to libx11 security update
+
+ -- John-Mark Bell <jmb@pexip.com>  Mon, 01 Jun 2015 16:56:37 +0100
+
 cairo (1.10.2-6.1ubuntu3pexip1) pexip; urgency=low
 
   * Prepare Pexip packaging

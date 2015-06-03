@@ -60,8 +60,9 @@ static struct alloc_stats_t total_allocations;
 static struct func_stat_t *func_stats[31627];
 static int func_stats_num;
 
-#define ARRAY_SIZE(A) (sizeof (A)/sizeof (A[0]))
-
+#ifndef ARRAY_LENGTH
+#define ARRAY_LENGTH(__array) ((int) (sizeof (__array) / sizeof (__array[0])))
+#endif
 static void
 alloc_stats_add (struct alloc_stats_t *stats, int is_realloc, size_t size)
 {
@@ -147,7 +148,7 @@ func_stats_add (const void *caller, int is_realloc, size_t size)
 
 	alloc_stats_add (&total_allocations, is_realloc, size);
 
-	i = ((uintptr_t) caller ^ 1215497) % ARRAY_SIZE (func_stats);
+	i = ((uintptr_t) caller ^ 1215497) % ARRAY_LENGTH (func_stats);
 	for (elt = func_stats[i]; elt != NULL; elt = elt->next) {
 		if (elt->addr == caller)
 			break;
@@ -236,7 +237,7 @@ my_init_hook(void) {
 	my_hooks ();
 }
 
-void (*__malloc_initialize_hook) (void) = my_init_hook;
+void (*__volatile __malloc_initialize_hook) (void) = my_init_hook;
 
 
 /* reporting */
@@ -257,7 +258,7 @@ add_alloc_stats (struct alloc_stats_t *a, struct alloc_stats_t *b)
 static void
 dump_alloc_stats (struct alloc_stats_t *stats, const char *name)
 {
-	printf ("%8u %'11llu	%8u %'11llu	%8u %'11llu	%s\n",
+	printf ("%8u %'11llu %8u %'11llu %8u %'11llu %s\n",
 		stats->total.num, stats->total.size,
 		stats->malloc.num, stats->malloc.size,
 		stats->realloc.num, stats->realloc.size,
@@ -328,7 +329,7 @@ malloc_stats (void)
 		return;
 
 	j = 0;
-	for (i = 0; i < ARRAY_SIZE (func_stats); i++) {
+	for (i = 0; i < ARRAY_LENGTH (func_stats); i++) {
 		struct func_stat_t *elt;
 		for (elt = func_stats[i]; elt != NULL; elt = elt->next)
 			sorted_func_stats[j++] = *elt;
@@ -353,8 +354,8 @@ malloc_stats (void)
 
 	setlocale (LC_ALL, "");
 
-	printf ("	 TOTAL			 MALLOC			REALLOC\n");
-	printf ("     num	size	     num	size	     num	size\n");
+	printf ("          TOTAL                MALLOC              REALLOC\n");
+	printf ("     num        size      num        size      num        size\n");
 
 	for (i = 0; i < j; i++) {
 		dump_alloc_stats (&sorted_func_stats[i].stat,

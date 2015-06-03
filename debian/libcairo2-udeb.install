@@ -1,1 +1,2 @@
-debian/install/udeb/usr/lib/libcairo.so.* /usr/lib
+usr/lib/*/libcairo.so.*
+usr/lib/*/libcairo-gobject.so.*

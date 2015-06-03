@@ -42,7 +42,7 @@ make_path (cairo_t *cr)
     };
     unsigned int i, j;
 
-    for (j = 0; j < sizeof (scales) / sizeof (scales[0]); j++) {
+    for (j = 0; j < ARRAY_LENGTH (scales); j++) {
 	cairo_save (cr);
 	/* include reflections to flip the orientation of the join */
 	cairo_scale (cr, scales[j].x, scales[j].y);
@@ -101,7 +101,7 @@ draw (cairo_t *cr, int width, int height)
 
 CAIRO_TEST (joins,
 	    "Test joins",
-	    "stroke joins", /* keywords */
+	    "stroke, joins", /* keywords */
 	    NULL, /* requirements */
 	    3 * (PAD + SIZE) + PAD,
 	    3 * (PAD + SIZE) + PAD,

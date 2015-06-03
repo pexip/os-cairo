@@ -33,6 +33,97 @@
 #include "cairoint.h"
 
 #include "cairo-xcb-private.h"
+#include "cairo-list-inline.h"
+
+#include "cairo-fontconfig-private.h"
+
+static void
+_cairo_xcb_init_screen_font_options (cairo_xcb_screen_t *screen)
+{
+    cairo_xcb_resources_t res;
+    cairo_antialias_t antialias;
+    cairo_subpixel_order_t subpixel_order;
+    cairo_lcd_filter_t lcd_filter;
+    cairo_hint_style_t hint_style;
+
+    _cairo_xcb_resources_get (screen, &res);
+
+    /* the rest of the code in this function is copied from
+       _cairo_xlib_init_screen_font_options in cairo-xlib-screen.c */
+
+    if (res.xft_hinting) {
+	switch (res.xft_hintstyle) {
+	case FC_HINT_NONE:
+	    hint_style = CAIRO_HINT_STYLE_NONE;
+	    break;
+	case FC_HINT_SLIGHT:
+	    hint_style = CAIRO_HINT_STYLE_SLIGHT;
+	    break;
+	case FC_HINT_MEDIUM:
+	    hint_style = CAIRO_HINT_STYLE_MEDIUM;
+	    break;
+	case FC_HINT_FULL:
+	    hint_style = CAIRO_HINT_STYLE_FULL;
+	    break;
+	default:
+	    hint_style = CAIRO_HINT_STYLE_DEFAULT;
+	}
+    } else {
+	hint_style = CAIRO_HINT_STYLE_NONE;
+    }
+
+    switch (res.xft_rgba) {
+    case FC_RGBA_RGB:
+	subpixel_order = CAIRO_SUBPIXEL_ORDER_RGB;
+	break;
+    case FC_RGBA_BGR:
+	subpixel_order = CAIRO_SUBPIXEL_ORDER_BGR;
+	break;
+    case FC_RGBA_VRGB:
+	subpixel_order = CAIRO_SUBPIXEL_ORDER_VRGB;
+	break;
+    case FC_RGBA_VBGR:
+	subpixel_order = CAIRO_SUBPIXEL_ORDER_VBGR;
+	break;
+    case FC_RGBA_UNKNOWN:
+    case FC_RGBA_NONE:
+    default:
+	subpixel_order = CAIRO_SUBPIXEL_ORDER_DEFAULT;
+    }
+
+    switch (res.xft_lcdfilter) {
+    case FC_LCD_NONE:
+	lcd_filter = CAIRO_LCD_FILTER_NONE;
+	break;
+    case FC_LCD_DEFAULT:
+	lcd_filter = CAIRO_LCD_FILTER_FIR5;
+	break;
+    case FC_LCD_LIGHT:
+	lcd_filter = CAIRO_LCD_FILTER_FIR3;
+	break;
+    case FC_LCD_LEGACY:
+	lcd_filter = CAIRO_LCD_FILTER_INTRA_PIXEL;
+	break;
+    default:
+	lcd_filter = CAIRO_LCD_FILTER_DEFAULT;
+	break;
+    }
+
+    if (res.xft_antialias) {
+	if (subpixel_order == CAIRO_SUBPIXEL_ORDER_DEFAULT)
+	    antialias = CAIRO_ANTIALIAS_GRAY;
+	else
+	    antialias = CAIRO_ANTIALIAS_SUBPIXEL;
+    } else {
+	antialias = CAIRO_ANTIALIAS_NONE;
+    }
+
+    cairo_font_options_set_hint_style (&screen->font_options, hint_style);
+    cairo_font_options_set_antialias (&screen->font_options, antialias);
+    cairo_font_options_set_subpixel_order (&screen->font_options, subpixel_order);
+    _cairo_font_options_set_lcd_filter (&screen->font_options, lcd_filter);
+    cairo_font_options_set_hint_metrics (&screen->font_options, CAIRO_HINT_METRICS_ON);
+}
 
 struct pattern_cache_entry {
     cairo_cache_entry_t key;
@@ -57,9 +148,17 @@ _cairo_xcb_screen_finish (cairo_xcb_screen_t *screen)
 					   cairo_xcb_surface_t,
 					   link)->base;
 
-	cairo_surface_reference (surface);
 	cairo_surface_finish (surface);
-	cairo_surface_destroy (surface);
+    }
+
+    while (! cairo_list_is_empty (&screen->pictures)) {
+	cairo_surface_t *surface;
+
+	surface = &cairo_list_first_entry (&screen->pictures,
+					   cairo_xcb_picture_t,
+					   link)->base;
+
+	cairo_surface_finish (surface);
     }
 
     for (i = 0; i < screen->solid_cache_size; i++)
@@ -68,32 +167,22 @@ _cairo_xcb_screen_finish (cairo_xcb_screen_t *screen)
     for (i = 0; i < ARRAY_LENGTH (screen->stock_colors); i++)
 	cairo_surface_destroy (screen->stock_colors[i]);
 
-    _cairo_cache_fini (&screen->surface_pattern_cache);
+    for (i = 0; i < ARRAY_LENGTH (screen->gc); i++) {
+	if (screen->gc_depths[i] != 0)
+	    _cairo_xcb_connection_free_gc (screen->connection, screen->gc[i]);
+    }
+
     _cairo_cache_fini (&screen->linear_pattern_cache);
     _cairo_cache_fini (&screen->radial_pattern_cache);
     _cairo_freelist_fini (&screen->pattern_cache_entry_freelist);
 
-    cairo_device_finish (screen->device);
-    cairo_device_destroy (screen->device);
-
     free (screen);
-}
-
-static cairo_bool_t
-_surface_pattern_cache_entry_equal (const void *A, const void *B)
-{
-    const struct pattern_cache_entry *a = A, *b = B;
-
-    return a->key.hash == b->key.hash;
 }
 
 static cairo_bool_t
 _linear_pattern_cache_entry_equal (const void *A, const void *B)
 {
     const struct pattern_cache_entry *a = A, *b = B;
-
-    if (a->key.hash != b->key.hash)
-	return FALSE;
 
     return _cairo_linear_pattern_equal (&a->pattern.gradient.linear,
 					&b->pattern.gradient.linear);
@@ -104,22 +193,8 @@ _radial_pattern_cache_entry_equal (const void *A, const void *B)
 {
     const struct pattern_cache_entry *a = A, *b = B;
 
-    if (a->key.hash != b->key.hash)
-	return FALSE;
-
     return _cairo_radial_pattern_equal (&a->pattern.gradient.radial,
 					&b->pattern.gradient.radial);
-}
-
-static void
-_surface_cache_entry_destroy (void *closure)
-{
-    struct pattern_cache_entry *entry = closure;
-
-    if (entry->picture->snapshot_of != NULL)
-	_cairo_surface_detach_snapshot (entry->picture);
-    cairo_surface_destroy (entry->picture);
-    _cairo_freelist_free (&entry->screen->pattern_cache_entry_freelist, entry);
 }
 
 static void
@@ -131,85 +206,6 @@ _pattern_cache_entry_destroy (void *closure)
     cairo_surface_destroy (entry->picture);
     _cairo_freelist_free (&entry->screen->pattern_cache_entry_freelist, entry);
 }
-
-#if CAIRO_HAS_DRM_SURFACE && CAIRO_HAS_XCB_DRM_FUNCTIONS
-#include "drm/cairo-drm-private.h"
-
-#include <drm/drm.h>
-#include <sys/ioctl.h>
-#include <xcb/dri2.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-
-static int drm_magic (int fd, uint32_t *magic)
-{
-    drm_auth_t auth;
-
-    if (ioctl (fd, DRM_IOCTL_GET_MAGIC, &auth))
-	return -errno;
-
-    *magic = auth.magic;
-    return 0;
-}
-
-static cairo_device_t *
-_xcb_drm_device (xcb_connection_t	*xcb_connection,
-		 xcb_screen_t		*xcb_screen)
-{
-    cairo_device_t *device = NULL;
-    xcb_dri2_connect_reply_t *connect;
-    drm_magic_t magic;
-    int fd;
-
-    connect = xcb_dri2_connect_reply (xcb_connection,
-				      xcb_dri2_connect (xcb_connection,
-							xcb_screen->root,
-							0),
-				      0);
-    if (connect == NULL)
-	return NULL;
-
-    fd = open (xcb_dri2_connect_device_name (connect), O_RDWR);
-    free (connect);
-
-    if (fd < 0)
-	return NULL;
-
-    device = cairo_drm_device_get_for_fd (fd);
-    close (fd);
-
-    if (device != NULL) {
-	xcb_dri2_authenticate_reply_t *authenticate;
-
-	if (drm_magic (((cairo_drm_device_t *) device)->fd, &magic) < 0) {
-	    cairo_device_destroy (device);
-	    return NULL;
-	}
-
-	authenticate = xcb_dri2_authenticate_reply (xcb_connection,
-						    xcb_dri2_authenticate (xcb_connection,
-									   xcb_screen->root,
-									   magic),
-						    0);
-	if (authenticate == NULL) {
-	    cairo_device_destroy (device);
-	    return NULL;
-	}
-
-	free (authenticate);
-    }
-
-    return device;
-}
-#else
-static cairo_device_t *
-_xcb_drm_device (xcb_connection_t	*xcb_connection,
-		 xcb_screen_t		*xcb_screen)
-{
-    return NULL;
-}
-#endif
 
 cairo_xcb_screen_t *
 _cairo_xcb_screen_get (xcb_connection_t *xcb_connection,
@@ -246,31 +242,20 @@ _cairo_xcb_screen_get (xcb_connection_t *xcb_connection,
 
     screen->connection = connection;
     screen->xcb_screen = xcb_screen;
+    screen->has_font_options = FALSE;
 
     _cairo_freelist_init (&screen->pattern_cache_entry_freelist,
 			  sizeof (struct pattern_cache_entry));
     cairo_list_init (&screen->link);
     cairo_list_init (&screen->surfaces);
+    cairo_list_init (&screen->pictures);
 
-    if (connection->flags & CAIRO_XCB_HAS_DRI2)
-	screen->device = _xcb_drm_device (xcb_connection, xcb_screen);
-    else
-	screen->device = NULL;
-
-    screen->gc_depths = 0;
+    memset (screen->gc_depths, 0, sizeof (screen->gc_depths));
     memset (screen->gc, 0, sizeof (screen->gc));
 
     screen->solid_cache_size = 0;
     for (i = 0; i < ARRAY_LENGTH (screen->stock_colors); i++)
 	screen->stock_colors[i] = NULL;
-
-    status = _cairo_cache_init (&screen->surface_pattern_cache,
-				_surface_pattern_cache_entry_equal,
-				NULL,
-				_surface_cache_entry_destroy,
-				16*1024*1024);
-    if (unlikely (status))
-	goto error_screen;
 
     status = _cairo_cache_init (&screen->linear_pattern_cache,
 				_linear_pattern_cache_entry_equal,
@@ -278,7 +263,7 @@ _cairo_xcb_screen_get (xcb_connection_t *xcb_connection,
 				_pattern_cache_entry_destroy,
 				16);
     if (unlikely (status))
-	goto error_surface;
+	goto error_screen;
 
     status = _cairo_cache_init (&screen->radial_pattern_cache,
 				_radial_pattern_cache_entry_equal,
@@ -297,11 +282,8 @@ unlock:
 
 error_linear:
     _cairo_cache_fini (&screen->linear_pattern_cache);
-error_surface:
-    _cairo_cache_fini (&screen->surface_pattern_cache);
 error_screen:
     CAIRO_MUTEX_UNLOCK (connection->screens_mutex);
-    cairo_device_destroy (screen->device);
     free (screen);
 
     return NULL;
@@ -328,8 +310,8 @@ _cairo_xcb_screen_get_gc (cairo_xcb_screen_t *screen,
     assert (CAIRO_MUTEX_IS_LOCKED (screen->connection->device.mutex));
 
     for (i = 0; i < ARRAY_LENGTH (screen->gc); i++) {
-	if (((screen->gc_depths >> (8*i)) & 0xff) == depth) {
-	    screen->gc_depths &= ~(0xff << (8*i));
+	if (screen->gc_depths[i] == depth) {
+	    screen->gc_depths[i] = 0;
 	    return screen->gc[i];
 	}
     }
@@ -345,7 +327,7 @@ _cairo_xcb_screen_put_gc (cairo_xcb_screen_t *screen, int depth, xcb_gcontext_t 
     assert (CAIRO_MUTEX_IS_LOCKED (screen->connection->device.mutex));
 
     for (i = 0; i < ARRAY_LENGTH (screen->gc); i++) {
-	if (((screen->gc_depths >> (8*i)) & 0xff) == 0)
+	if (screen->gc_depths[i] == 0)
 	    break;
     }
 
@@ -356,55 +338,7 @@ _cairo_xcb_screen_put_gc (cairo_xcb_screen_t *screen, int depth, xcb_gcontext_t 
     }
 
     screen->gc[i] = gc;
-    screen->gc_depths &= ~(0xff << (8*i));
-    screen->gc_depths |= depth << (8*i);
-}
-
-cairo_status_t
-_cairo_xcb_screen_store_surface_picture (cairo_xcb_screen_t *screen,
-					 cairo_surface_t *picture,
-					 unsigned int size)
-{
-    struct pattern_cache_entry *entry;
-    cairo_status_t status;
-
-    assert (CAIRO_MUTEX_IS_LOCKED (screen->connection->device.mutex));
-
-    entry = _cairo_freelist_alloc (&screen->pattern_cache_entry_freelist);
-    if (unlikely (entry == NULL))
-	return _cairo_error (CAIRO_STATUS_NO_MEMORY);
-
-    entry->key.hash = picture->unique_id;
-    entry->key.size = size;
-
-    entry->picture = cairo_surface_reference (picture);
-    entry->screen = screen;
-
-    status = _cairo_cache_insert (&screen->surface_pattern_cache,
-				  &entry->key);
-    if (unlikely (status)) {
-	cairo_surface_destroy (picture);
-	_cairo_freelist_free (&screen->pattern_cache_entry_freelist, entry);
-	return status;
-    }
-
-    return CAIRO_STATUS_SUCCESS;
-}
-
-void
-_cairo_xcb_screen_remove_surface_picture (cairo_xcb_screen_t *screen,
-					  cairo_surface_t *picture)
-{
-    struct pattern_cache_entry tmpl;
-    struct pattern_cache_entry *entry;
-
-    assert (CAIRO_MUTEX_IS_LOCKED (screen->connection->device.mutex));
-
-    tmpl.key.hash = picture->unique_id;
-
-    entry = _cairo_cache_lookup (&screen->surface_pattern_cache, &tmpl.key);
-    if (entry != NULL)
-	_cairo_cache_remove (&screen->surface_pattern_cache, &entry->key);
+    screen->gc_depths[i] = depth;
 }
 
 cairo_status_t
@@ -518,4 +452,27 @@ _cairo_xcb_screen_lookup_radial_picture (cairo_xcb_screen_t *screen,
 	picture = cairo_surface_reference (entry->picture);
 
     return picture;
+}
+
+cairo_font_options_t *
+_cairo_xcb_screen_get_font_options (cairo_xcb_screen_t *screen)
+{
+    if (! screen->has_font_options) {
+	_cairo_font_options_init_default (&screen->font_options);
+	_cairo_font_options_set_round_glyph_positions (&screen->font_options, CAIRO_ROUND_GLYPH_POS_ON);
+
+	/* XXX: This is disabled because something seems to be merging
+	   font options incorrectly for xcb.  This effectively reverts
+	   the changes brought in git e691d242, and restores ~150 tests
+	   to resume passing.  See mailing list archives for Sep 17,
+	   2014 for more discussion. */
+	if (0 && ! _cairo_xcb_connection_acquire (screen->connection)) {
+	    _cairo_xcb_init_screen_font_options (screen);
+	    _cairo_xcb_connection_release (screen->connection);
+	}
+
+	screen->has_font_options = TRUE;
+    }
+
+    return &screen->font_options;
 }

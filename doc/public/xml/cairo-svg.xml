@@ -46,15 +46,15 @@ SVG files and is a multi-page vector surface backend.
 </refsect1>
 <refsect1 id="cairo-SVG-Surfaces.details" role="details">
 <title role="details.title">Details</title>
-<refsect2 id="CAIRO-HAS-SVG-SURFACE:CAPS" role="macro">
+<refsect2 id="CAIRO-HAS-SVG-SURFACE:CAPS" role="macro" condition="since:1.2">
 <title>CAIRO_HAS_SVG_SURFACE</title>
-<indexterm zone="CAIRO-HAS-SVG-SURFACE:CAPS"><primary sortas="HAS_SVG_SURFACE">CAIRO_HAS_SVG_SURFACE</primary></indexterm>
+<indexterm zone="CAIRO-HAS-SVG-SURFACE:CAPS" role="1.2"><primary sortas="HAS_SVG_SURFACE">CAIRO_HAS_SVG_SURFACE</primary></indexterm>
 <programlisting>#define CAIRO_HAS_SVG_SURFACE 1
 </programlisting>
 <para>
 Defined if the SVG surface backend is available.
 This macro can be used to conditionally compile backend-specific code.
-</para></refsect2>
+</para><para role="since">Since 1.2</para></refsect2>
 <refsect2 id="cairo-svg-surface-create" role="function" condition="since:1.2">
 <title>cairo_svg_surface_create ()</title>
 <indexterm zone="cairo-svg-surface-create" role="1.2"><primary sortas="svg_surface_create">cairo_svg_surface_create</primary></indexterm>
@@ -86,25 +86,19 @@ Base64-encoded and emitted.
 </para><variablelist role="params">
 <varlistentry><term><parameter>filename</parameter>&#160;:</term>
 <listitem><simpara>a filename for the SVG output (must be writable), <link linkend="NULL:CAPS"><literal>NULL</literal></link> may be
-           used to specify no output. This will generate a SVG surface that
-           may be queried and used as a source, without generating a
-           temporary file.
-</simpara></listitem></varlistentry>
+used to specify no output. This will generate a SVG surface that
+may be queried and used as a source, without generating a
+temporary file.</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>width_in_points</parameter>&#160;:</term>
-<listitem><simpara>width of the surface, in points (1 point == 1/72.0 inch)
-</simpara></listitem></varlistentry>
+<listitem><simpara>width of the surface, in points (1 point == 1/72.0 inch)</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>height_in_points</parameter>&#160;:</term>
-<listitem><simpara>height of the surface, in points (1 point == 1/72.0 inch)
-</simpara></listitem></varlistentry>
-<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara> a pointer to the newly created surface. The caller
+<listitem><simpara>height of the surface, in points (1 point == 1/72.0 inch)</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara>a pointer to the newly created surface. The caller
 owns the surface and should call <link linkend="cairo-surface-destroy"><function>cairo_surface_destroy()</function></link> when done
 with it.
-
 This function always returns a valid pointer, but it will return a
 pointer to a "nil" surface if an error such as out of memory
-occurs. You can use <link linkend="cairo-surface-status"><function>cairo_surface_status()</function></link> to check for this.
-
-</simpara></listitem></varlistentry>
+occurs. You can use <link linkend="cairo-surface-status"><function>cairo_surface_status()</function></link> to check for this.</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.2</para></refsect2>
 <refsect2 id="cairo-svg-surface-create-for-stream" role="function" condition="since:1.2">
 <title>cairo_svg_surface_create_for_stream ()</title>
@@ -119,28 +113,21 @@ incrementally to the stream represented by <parameter>write_func</parameter> and
 </para><variablelist role="params">
 <varlistentry><term><parameter>write_func</parameter>&#160;:</term>
 <listitem><simpara>a <link linkend="cairo-write-func-t"><type>cairo_write_func_t</type></link> to accept the output data, may be <link linkend="NULL:CAPS"><literal>NULL</literal></link>
-             to indicate a no-op <parameter>write_func</parameter>. With a no-op <parameter>write_func</parameter>,
-             the surface may be queried or used as a source without
-             generating any temporary files.
-</simpara></listitem></varlistentry>
+to indicate a no-op <parameter>write_func</parameter>. With a no-op <parameter>write_func</parameter>,
+the surface may be queried or used as a source without
+generating any temporary files.</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>closure</parameter>&#160;:</term>
-<listitem><simpara>the closure argument for <parameter>write_func</parameter>
-</simpara></listitem></varlistentry>
+<listitem><simpara>the closure argument for <parameter>write_func</parameter></simpara></listitem></varlistentry>
 <varlistentry><term><parameter>width_in_points</parameter>&#160;:</term>
-<listitem><simpara>width of the surface, in points (1 point == 1/72.0 inch)
-</simpara></listitem></varlistentry>
+<listitem><simpara>width of the surface, in points (1 point == 1/72.0 inch)</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>height_in_points</parameter>&#160;:</term>
-<listitem><simpara>height of the surface, in points (1 point == 1/72.0 inch)
-</simpara></listitem></varlistentry>
-<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara> a pointer to the newly created surface. The caller
+<listitem><simpara>height of the surface, in points (1 point == 1/72.0 inch)</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara>a pointer to the newly created surface. The caller
 owns the surface and should call <link linkend="cairo-surface-destroy"><function>cairo_surface_destroy()</function></link> when done
 with it.
-
 This function always returns a valid pointer, but it will return a
 pointer to a "nil" surface if an error such as out of memory
-occurs. You can use <link linkend="cairo-surface-status"><function>cairo_surface_status()</function></link> to check for this.
-
-</simpara></listitem></varlistentry>
+occurs. You can use <link linkend="cairo-surface-status"><function>cairo_surface_status()</function></link> to check for this.</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.2</para></refsect2>
 <refsect2 id="cairo-svg-surface-restrict-to-version" role="function" condition="since:1.2">
 <title>cairo_svg_surface_restrict_to_version ()</title>
@@ -159,16 +146,14 @@ this is to call this function immediately after creating the
 surface.
 </para><variablelist role="params">
 <varlistentry><term><parameter>surface</parameter>&#160;:</term>
-<listitem><simpara>a SVG <link linkend="cairo-surface-t"><type>cairo_surface_t</type></link>
-</simpara></listitem></varlistentry>
+<listitem><simpara>a SVG <link linkend="cairo-surface-t"><type>cairo_surface_t</type></link></simpara></listitem></varlistentry>
 <varlistentry><term><parameter>version</parameter>&#160;:</term>
-<listitem><simpara>SVG version
-</simpara></listitem></varlistentry>
+<listitem><simpara>SVG version</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.2</para></refsect2>
-<refsect2 id="cairo-svg-version-t" role="enum">
+<refsect2 id="cairo-svg-version-t" role="enum" condition="since:1.2">
 <title>enum cairo_svg_version_t</title>
-<indexterm zone="cairo-svg-version-t"><primary sortas="svg_version_t">cairo_svg_version_t</primary></indexterm>
-<programlisting>typedef enum _cairo_svg_version {
+<indexterm zone="cairo-svg-version-t" role="1.2"><primary sortas="svg_version_t">cairo_svg_version_t</primary></indexterm>
+<programlisting>typedef enum {
     CAIRO_SVG_VERSION_1_1,
     CAIRO_SVG_VERSION_1_2
 } cairo_svg_version_t;
@@ -179,15 +164,15 @@ specification that a generated SVG file will conform to.
 </para><variablelist role="enum">
 <varlistentry id="CAIRO-SVG-VERSION-1-1:CAPS" role="constant">
 <term><literal>CAIRO_SVG_VERSION_1_1</literal></term>
-<listitem><simpara>The version 1.1 of the SVG specification.
+<listitem><simpara>The version 1.1 of the SVG specification. (Since 1.2)
 </simpara></listitem>
 </varlistentry>
 <varlistentry id="CAIRO-SVG-VERSION-1-2:CAPS" role="constant">
 <term><literal>CAIRO_SVG_VERSION_1_2</literal></term>
-<listitem><simpara>The version 1.2 of the SVG specification.
+<listitem><simpara>The version 1.2 of the SVG specification. (Since 1.2)
 </simpara></listitem>
 </varlistentry>
-</variablelist></refsect2>
+</variablelist><para role="since">Since 1.2</para></refsect2>
 <refsect2 id="cairo-svg-get-versions" role="function" condition="since:1.2">
 <title>cairo_svg_get_versions ()</title>
 <indexterm zone="cairo-svg-get-versions" role="1.2"><primary sortas="svg_get_versions">cairo_svg_get_versions</primary></indexterm>
@@ -198,11 +183,9 @@ Used to retrieve the list of supported versions. See
 <link linkend="cairo-svg-surface-restrict-to-version"><function>cairo_svg_surface_restrict_to_version()</function></link>.
 </para><variablelist role="params">
 <varlistentry><term><parameter>versions</parameter>&#160;:</term>
-<listitem><simpara>supported version list
-</simpara></listitem></varlistentry>
+<listitem><simpara>supported version list</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>num_versions</parameter>&#160;:</term>
-<listitem><simpara>list length
-</simpara></listitem></varlistentry>
+<listitem><simpara>list length</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.2</para></refsect2>
 <refsect2 id="cairo-svg-version-to-string" role="function" condition="since:1.2">
 <title>cairo_svg_version_to_string ()</title>
@@ -214,11 +197,8 @@ will return <link linkend="NULL:CAPS"><literal>NULL</literal></link> if <paramet
 for a way to get the list of valid version ids.
 </para><variablelist role="params">
 <varlistentry><term><parameter>version</parameter>&#160;:</term>
-<listitem><simpara>a version id
-</simpara></listitem></varlistentry>
-<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara> the string associated to given version.
-
-</simpara></listitem></varlistentry>
+<listitem><simpara>a version id</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara>the string associated to given version.</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.2</para></refsect2>
 
 </refsect1>

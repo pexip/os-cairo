@@ -1,3 +1,272 @@
+cairo (1.14.0-2.1pexip1) pexip; urgency=low
+
+  * New upstream release; migrate to Jessie
+
+ -- John-Mark Bell <jmb@pexip.com>  Wed, 03 Jun 2015 17:42:37 +0100
+
+cairo (1.14.0-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * debian/patches - picked two post-release patches resolving Debian-reported
+    issues:
+    - 0005-CFF-Fix-unaligned-access.patch
+      fixes unaligned access reported on sparc (Closes: #712836)
+    - 0008-tor-scan-converter-can-t-do_fullrow-when-intersectio.patch
+      resolves segfault while rendering some graphs (Closes: #766479)
+
+ -- Yaroslav Halchenko <debian@onerussian.com>  Fri, 24 Oct 2014 15:36:28 -0400
+
+cairo (1.14.0-2) unstable; urgency=medium
+
+  * Modernise debian/rules using minimised dh.
+  * Use list-missing to show uninstalled files.
+  * Don't install libtool .la files.
+  * Add --as-needed to dh-autoreconf.
+  * Use canonical URLs for Vcs-* fields.
+  * Set pkg-gnome-maintainers@lists.alioth.debian.org as Maintainer.
+  * Install cairo-analyse-trace binary into cairo-perf-utils package.
+
+ -- Michael Biebl <biebl@debian.org>  Wed, 22 Oct 2014 16:37:08 +0200
+
+cairo (1.14.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Add debian/gbp.conf for git-buildpackage and configure it to use
+    pristine-tar.
+  * Update patches:
+    - Remove patches which have been merged upstream or no longer apply.
+    - Refresh remaining patches.
+  * Bump Standards-Version to 3.9.6.
+  * Drop initial article from description synopsis.
+  * Update symbols file and use the upstream version for the symbols
+    introduced in 1.12.16-3. Update shlibs version info accordingly for
+    libcairo2.
+
+ -- Michael Biebl <biebl@debian.org>  Tue, 21 Oct 2014 23:12:24 +0200
+
+cairo (1.12.16-5) unstable; urgency=medium
+
+  * debian/control:
+    + webkitgtk was also using the GL/EGL support, so add the necessary
+      breaks.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sat, 06 Sep 2014 14:26:26 +0200
+
+cairo (1.12.16-4) unstable; urgency=medium
+
+  * Disable experimental GL/EGL support. It doesn't bring much and
+    causes problems in platforms where the GL and the EGL/GLES stacks
+    are from different vendors, which is the case in some embedded
+    platforms, particularly in the ARM world.
+    Break weston versions that use the gl/egl symbols.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Fri, 05 Sep 2014 00:17:38 +0200
+
+cairo (1.12.16-3) unstable; urgency=medium
+
+  * Team upload.
+  * Cherry-pick patches from upstream for device scale (HiDPI) support
+    - image-Use-convolution-filters-for-sample-reconstruct.patch
+    - gstate-Respect-device-transform-in-stroke.patch
+    - default-context-Inherit-device-scale-in-push_group-s.patch
+    - subsurface-Handle-device-scales.patch
+    - gstate-Move-device-scale-font-scaling-to-gstate.patch
+    - gstate-Handle-device-scale-on-surface-as-source.patch
+    - spans-traps-Undo-device-transform-from-source-matrix.patch
+    - surface-expose-the-device-scale.patch
+    - surface-Opencode-create_similar.patch
+    - surface-Merge-scratch-construction-into-_cairo_surfa.patch
+    - surface-Inherit-device-scale-in-cairo_surface_create.patch
+    - trace-Record-set-device-scale.patch
+    - script-Add-support-for-replaying-device-scale.patch
+    - Downscaling-requires-pixman-0.30.patch
+  * Update debian/libcairo2.symbols with added cairo_surface_get_device_scale
+  * Bump pixman build-dependency to >= 0.30.0
+
+ -- Andreas Henriksson <andreas@fatal.se>  Sun, 24 Aug 2014 10:17:07 -0700
+
+cairo (1.12.16-2) unstable; urgency=low
+
+  [ Cyril Brulebois ]
+  * Misc fixes:
+    + Update libcairo2-udeb's description (one line is sufficient).
+    + Use the official field for udebs: Package-Type.
+
+  [ Michael Biebl ]
+  * Add myself to uploaders.
+  * The libcairo2-udeb package already ships the libcairo-gobject2 library, so
+    instead of splitting libcairo-gobject2 into its separate udeb, just fix
+    the shlibs information for libcairo-gobject2 to point to libcairo2-udeb.
+    Closes: #648533
+
+ -- Michael Biebl <biebl@debian.org>  Tue, 17 Sep 2013 16:37:22 +0200
+
+cairo (1.12.16-1) unstable; urgency=low
+
+  * Team upload.
+  * New upstream release.
+  * Fix symbol versions for the gl/egl symbols. Closes: #714845
+  * Add new symbols.
+  * Refresh patches.
+
+ -- Michael Biebl <biebl@debian.org>  Fri, 13 Sep 2013 02:55:29 +0200
+
+cairo (1.12.14-5) unstable; urgency=low
+
+  * Add gl/egl support back now that wayland has been multi-archified.
+    Closes: #712022.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Wed, 12 Jun 2013 19:33:43 +0200
+
+cairo (1.12.14-4) unstable; urgency=low
+
+  * debian/control:
+    + Make libcairo2-dev depend on libxext-dev.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Wed, 08 May 2013 15:26:06 +0200
+
+cairo (1.12.14-3) unstable; urgency=low
+
+  * Team upload.
+  * Disable EGL/GL support for now until libwayland has support for
+    multi-arch.
+
+ -- Michael Biebl <biebl@debian.org>  Wed, 08 May 2013 11:43:53 +0200
+
+cairo (1.12.14-2) unstable; urgency=low
+
+  * Upload to unstable.
+
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 06 May 2013 08:32:44 +0200
+
+cairo (1.12.14-1) experimental; urgency=low
+
+  * New upstream release.
+
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 11 Feb 2013 23:47:53 +0100
+
+cairo (1.12.12-1) experimental; urgency=low
+
+  * Team upload.
+  * New upstream release.
+  * Track .xz tarballs.
+  * Bump Standards-Version to 3.9.4.
+  * Bump debhelper compatility level to 9.
+  * Use --as-needed feature of dh-autoreconf.
+  * Refresh 01_build_perf_utils.patch.
+  * Remove obsolete Breaks.
+
+ -- Michael Biebl <biebl@debian.org>  Mon, 11 Feb 2013 22:41:55 +0100
+
+cairo (1.12.10-1) experimental; urgency=low
+
+  * New upstream bugfix release:
+    + debian/control:
+      - Build-depend on liblzo2-dev.
+
+ -- Sebastian Dröge <slomo@debian.org>  Fri, 18 Jan 2013 11:02:22 +0100
+
+cairo (1.12.6-1) experimental; urgency=low
+
+  [ Sebastian Dröge ]
+  * New upstream bugfix release.
+
+  [ Martin Pitt ]
+  * Add debian/tests: Simple compile/link/run autopkgtest. Thanks Rafał
+    Cieślak! (LP: #1073374)
+
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 12 Nov 2012 15:29:05 +0100
+
+cairo (1.12.4-1) experimental; urgency=low
+
+  * New upstream bugfix release:
+    + debian/control:
+      - Build-depend on libxext-dev.
+  * debian/control:
+    + Build-depend on libpng-dev instead of libpng12-dev (Closes: #662279, #642264, #673642).
+  * debian/control,
+    debian/rules,
+    debian/libcairo2.symbols:
+    + Re-enable OpenGL/EGL backend (Closes: #684302).
+
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 08 Oct 2012 10:05:46 +0200
+
+cairo (1.12.2-2) unstable; urgency=low
+
+  * debian/libcairo2-udeb.install:
+    + Add the GObject library to the udeb. Needed by GTK+3 nowadays.
+      Thanks to Michael Biebl for the patch.
+
+ -- Sebastian Dröge <slomo@debian.org>  Thu, 17 May 2012 13:22:36 +0200
+
+cairo (1.12.2-1) unstable; urgency=low
+
+  * New upstream bugfix release:
+    + debian/patches/07_traps-Clip-the-trapezoid-extents-against-the-clip-ex.patch,
+      debian/patches/08_xlib-Allow-applications-to-create-0x0-surfaces.patch:
+      - Dropped, merged upstream.
+    + Refresh patches to apply cleanly again.
+
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 30 Apr 2012 14:30:31 +0200
+
+cairo (1.12.0-2.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * 07_traps-Clip-the-trapezoid-extents-against-the-clip-ex.patch:
+    patch from upstream git fixing crashes in evince (closes: #668619)
+  * 08_xlib-Allow-applications-to-create-0x0-surfaces.patch: patch from
+    upstream git fixing libreoffice impress slideshow mode (closes: #668172)
+  * Exclude cairo-perf-utils from libcairo2-dbg (closes: #669990)
+  * Properly remove all stamp files in debian/rules clean.
+  * Drop dh_testroot from debian/rules clean.
+
+ -- Julien Cristau <jcristau@debian.org>  Thu, 26 Apr 2012 21:57:15 +0200
+
+cairo (1.12.0-2) unstable; urgency=low
+
+  * debian/rules:
+    + Enable hardened build flags (Closes: #655128).
+  * Upload to unstable.
+  * debian/patches/06_hurd-map-noreserve.patch:
+    + Hurd has no MAP_NORESERVE so don't use it there.
+
+ -- Sebastian Dröge <slomo@debian.org>  Fri, 30 Mar 2012 09:49:05 +0200
+
+cairo (1.12.0-1) experimental; urgency=low
+
+  * New upstream release:
+    + debian/control:
+      - Update XCB and pixman (build-) dependencies.
+    + debian/patches/04-LD_PRELOAD-is-supported-on-Hurd.patch:
+      - Dropped, merged upstream.
+    + debian/libcairo2.symbols:
+      - Update symbols file.
+
+ -- Sebastian Dröge <slomo@debian.org>  Tue, 27 Mar 2012 10:46:09 +0200
+
+cairo (1.10.2-7) unstable; urgency=low
+
+  * debian/cairo-perf-utils.install.in,
+    debian/clean,
+    debian/libcairo-gobject2.install.in,
+    debian/libcairo-script-interpreter2.install.in,
+    debian/libcairo2-dev.install.in,
+    debian/libcairo2.install.in,
+    debian/control,
+    debian/rules:
+    + Update package for multi-arch. Thanks to Steve Langasek and
+      Gregory Hainaut for the patches (Closes: #631873).
+
+ -- Sebastian Dröge <slomo@debian.org>  Tue, 06 Mar 2012 08:32:57 +0100
+
+cairo (1.10.2-6.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Refresh the ltmain-as-needed patch (closes: #648141). Thanks to Nobuhiro
+    Iwamatsu for the bug report and the initial patch.
+
+ -- Jakub Wilk <jwilk@debian.org>  Tue, 13 Dec 2011 19:06:10 +0100
+
 cairo (1.10.2-6.1ubuntu3pexip2) pexip; urgency=low
 
   * SECURITY UPDATE: buffer overflow in MakeBigReq
@@ -11,28 +280,6 @@ cairo (1.10.2-6.1ubuntu3pexip1) pexip; urgency=low
 
  -- John-Mark Bell <jmb@pexip.com>  Tue, 24 Dec 2013 13:34:05 +0000
 
-cairo (1.10.2-6.1ubuntu3) precise-proposed; urgency=low
-
-  * debian/patches/git_support_weird_pixmap_formats.patch:
-    - some users hit errors with some pixman datas, don't enforce the 
-      checking in the library but let the caller deal with those
-      (lp: #686836)
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 25 May 2012 15:23:42 +0200
-
-cairo (1.10.2-6.1ubuntu2) precise; urgency=low
-
-  * debian/ltmain_as-needed.patch:
-    - Refresh to fix FTBFS
-
- -- Michael Terry <mterry@ubuntu.com>  Mon, 21 Nov 2011 10:17:03 -0500
-
-cairo (1.10.2-6.1ubuntu1) precise; urgency=low
-
-  * disable-flto-for-gcc-4.6: replaced with the debian version
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 21 Nov 2011 10:28:19 +0100
-
 cairo (1.10.2-6.1) unstable; urgency=low
 
   * Non-maintainer upload.
@@ -40,33 +287,6 @@ cairo (1.10.2-6.1) unstable; urgency=low
     Closes: #625159.
 
  -- Aurelien Jarno <aurel32@debian.org>  Fri, 29 Jul 2011 19:00:54 +0200
-
-cairo (1.10.2-6ubuntu3) oneiric; urgency=low
-
-  * Don't turn the gl backend on, it still creates issues for nvidia users
-  * debian/control,
-    debian/libcairo2.symbols,
-    debian/rules:
-    - updated for the non-gl build
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 09 Aug 2011 22:47:20 +0200
-
-cairo (1.10.2-6ubuntu2) oneiric; urgency=low
-
-  * disable-flto-for-gcc-4.6: list it in the serie it was dropped by error.
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 10 Jun 2011 11:40:22 +0200
-
-cairo (1.10.2-6ubuntu1) oneiric; urgency=low
-
-  * Resynchronize on Debian, the remaining delta for ubuntu is:
-  * server_side_gradients.patch: don't use server side gradients, most drivers 
-    don't handle those and are really slow
-  * cairo-lp-680628.patch: git backport to fix pdf printing speed issues
-  * debian/patches/disable-flto-for-gcc-4.6: disable use of -flto when building.
-  * Build tweaks for multiarch, enable the GL backend
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 03 Jan 2011 16:47:46 +0100
 
 cairo (1.10.2-6) unstable; urgency=low
 

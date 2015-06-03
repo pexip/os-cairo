@@ -46,18 +46,37 @@ const <link linkend="char"><returnvalue>char</returnvalue></link> *        <link
 The PDF surface is used to render cairo graphics to Adobe
 PDF files and is a multi-page vector surface backend.
 </para>
+<para>
+The following mime types are supported: <link linkend="CAIRO-MIME-TYPE-JPEG:CAPS"><literal>CAIRO_MIME_TYPE_JPEG</literal></link>,
+<link linkend="CAIRO-MIME-TYPE-JP2:CAPS"><literal>CAIRO_MIME_TYPE_JP2</literal></link>, <link linkend="CAIRO-MIME-TYPE-UNIQUE-ID:CAPS"><literal>CAIRO_MIME_TYPE_UNIQUE_ID</literal></link>,
+<link linkend="CAIRO-MIME-TYPE-JBIG2:CAPS"><literal>CAIRO_MIME_TYPE_JBIG2</literal></link>, <link linkend="CAIRO-MIME-TYPE-JBIG2-GLOBAL:CAPS"><literal>CAIRO_MIME_TYPE_JBIG2_GLOBAL</literal></link>,
+<link linkend="CAIRO-MIME-TYPE-JBIG2-GLOBAL-ID:CAPS"><literal>CAIRO_MIME_TYPE_JBIG2_GLOBAL_ID</literal></link>.
+</para>
+<para>
+JBIG2 data in PDF must be in the embedded format as descibed in
+ISO/IEC 11544. Image specific JBIG2 data must be in
+<link linkend="CAIRO-MIME-TYPE-JBIG2:CAPS"><literal>CAIRO_MIME_TYPE_JBIG2</literal></link>.  Any global segments in the JBIG2 data
+(segments with page association field set to 0) must be in
+<link linkend="CAIRO-MIME-TYPE-JBIG2-GLOBAL:CAPS"><literal>CAIRO_MIME_TYPE_JBIG2_GLOBAL</literal></link>. The global data may be shared by
+multiple images. All images sharing the same global data must set
+<link linkend="CAIRO-MIME-TYPE-JBIG2-GLOBAL-ID:CAPS"><literal>CAIRO_MIME_TYPE_JBIG2_GLOBAL_ID</literal></link> to a unique identifer. At least
+one of the images must provide the global data using
+<link linkend="CAIRO-MIME-TYPE-JBIG2-GLOBAL:CAPS"><literal>CAIRO_MIME_TYPE_JBIG2_GLOBAL</literal></link>. The global data will only be
+embedded once but shared by all JBIG2 images with the same
+<link linkend="CAIRO-MIME-TYPE-JBIG2-GLOBAL-ID:CAPS"><literal>CAIRO_MIME_TYPE_JBIG2_GLOBAL_ID</literal></link>.
+</para>
 </refsect1>
 <refsect1 id="cairo-PDF-Surfaces.details" role="details">
 <title role="details.title">Details</title>
-<refsect2 id="CAIRO-HAS-PDF-SURFACE:CAPS" role="macro">
+<refsect2 id="CAIRO-HAS-PDF-SURFACE:CAPS" role="macro" condition="since:1.2">
 <title>CAIRO_HAS_PDF_SURFACE</title>
-<indexterm zone="CAIRO-HAS-PDF-SURFACE:CAPS"><primary sortas="HAS_PDF_SURFACE">CAIRO_HAS_PDF_SURFACE</primary></indexterm>
+<indexterm zone="CAIRO-HAS-PDF-SURFACE:CAPS" role="1.2"><primary sortas="HAS_PDF_SURFACE">CAIRO_HAS_PDF_SURFACE</primary></indexterm>
 <programlisting>#define CAIRO_HAS_PDF_SURFACE 1
 </programlisting>
 <para>
 Defined if the PDF surface backend is available.
 This macro can be used to conditionally compile backend-specific code.
-</para></refsect2>
+</para><para role="since">Since 1.2</para></refsect2>
 <refsect2 id="cairo-pdf-surface-create" role="function" condition="since:1.2">
 <title>cairo_pdf_surface_create ()</title>
 <indexterm zone="cairo-pdf-surface-create" role="1.2"><primary sortas="pdf_surface_create">cairo_pdf_surface_create</primary></indexterm>
@@ -70,25 +89,19 @@ to <parameter>filename</parameter>.
 </para><variablelist role="params">
 <varlistentry><term><parameter>filename</parameter>&#160;:</term>
 <listitem><simpara>a filename for the PDF output (must be writable), <link linkend="NULL:CAPS"><literal>NULL</literal></link> may be
-           used to specify no output. This will generate a PDF surface that
-           may be queried and used as a source, without generating a
-           temporary file.
-</simpara></listitem></varlistentry>
+used to specify no output. This will generate a PDF surface that
+may be queried and used as a source, without generating a
+temporary file.</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>width_in_points</parameter>&#160;:</term>
-<listitem><simpara>width of the surface, in points (1 point == 1/72.0 inch)
-</simpara></listitem></varlistentry>
+<listitem><simpara>width of the surface, in points (1 point == 1/72.0 inch)</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>height_in_points</parameter>&#160;:</term>
-<listitem><simpara>height of the surface, in points (1 point == 1/72.0 inch)
-</simpara></listitem></varlistentry>
-<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara> a pointer to the newly created surface. The caller
+<listitem><simpara>height of the surface, in points (1 point == 1/72.0 inch)</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara>a pointer to the newly created surface. The caller
 owns the surface and should call <link linkend="cairo-surface-destroy"><function>cairo_surface_destroy()</function></link> when done
 with it.
-
 This function always returns a valid pointer, but it will return a
 pointer to a "nil" surface if an error such as out of memory
-occurs. You can use <link linkend="cairo-surface-status"><function>cairo_surface_status()</function></link> to check for this.
-
-</simpara></listitem></varlistentry>
+occurs. You can use <link linkend="cairo-surface-status"><function>cairo_surface_status()</function></link> to check for this.</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.2</para></refsect2>
 <refsect2 id="cairo-pdf-surface-create-for-stream" role="function" condition="since:1.2">
 <title>cairo_pdf_surface_create_for_stream ()</title>
@@ -103,28 +116,21 @@ incrementally to the stream represented by <parameter>write_func</parameter> and
 </para><variablelist role="params">
 <varlistentry><term><parameter>write_func</parameter>&#160;:</term>
 <listitem><simpara>a <link linkend="cairo-write-func-t"><type>cairo_write_func_t</type></link> to accept the output data, may be <link linkend="NULL:CAPS"><literal>NULL</literal></link>
-             to indicate a no-op <parameter>write_func</parameter>. With a no-op <parameter>write_func</parameter>,
-             the surface may be queried or used as a source without
-             generating any temporary files.
-</simpara></listitem></varlistentry>
+to indicate a no-op <parameter>write_func</parameter>. With a no-op <parameter>write_func</parameter>,
+the surface may be queried or used as a source without
+generating any temporary files.</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>closure</parameter>&#160;:</term>
-<listitem><simpara>the closure argument for <parameter>write_func</parameter>
-</simpara></listitem></varlistentry>
+<listitem><simpara>the closure argument for <parameter>write_func</parameter></simpara></listitem></varlistentry>
 <varlistentry><term><parameter>width_in_points</parameter>&#160;:</term>
-<listitem><simpara>width of the surface, in points (1 point == 1/72.0 inch)
-</simpara></listitem></varlistentry>
+<listitem><simpara>width of the surface, in points (1 point == 1/72.0 inch)</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>height_in_points</parameter>&#160;:</term>
-<listitem><simpara>height of the surface, in points (1 point == 1/72.0 inch)
-</simpara></listitem></varlistentry>
-<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara> a pointer to the newly created surface. The caller
+<listitem><simpara>height of the surface, in points (1 point == 1/72.0 inch)</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara>a pointer to the newly created surface. The caller
 owns the surface and should call <link linkend="cairo-surface-destroy"><function>cairo_surface_destroy()</function></link> when done
 with it.
-
 This function always returns a valid pointer, but it will return a
 pointer to a "nil" surface if an error such as out of memory
-occurs. You can use <link linkend="cairo-surface-status"><function>cairo_surface_status()</function></link> to check for this.
-
-</simpara></listitem></varlistentry>
+occurs. You can use <link linkend="cairo-surface-status"><function>cairo_surface_status()</function></link> to check for this.</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.2</para></refsect2>
 <refsect2 id="cairo-pdf-surface-restrict-to-version" role="function" condition="since:1.10">
 <title>cairo_pdf_surface_restrict_to_version ()</title>
@@ -143,16 +149,14 @@ this is to call this function immediately after creating the
 surface.
 </para><variablelist role="params">
 <varlistentry><term><parameter>surface</parameter>&#160;:</term>
-<listitem><simpara>a PDF <link linkend="cairo-surface-t"><type>cairo_surface_t</type></link>
-</simpara></listitem></varlistentry>
+<listitem><simpara>a PDF <link linkend="cairo-surface-t"><type>cairo_surface_t</type></link></simpara></listitem></varlistentry>
 <varlistentry><term><parameter>version</parameter>&#160;:</term>
-<listitem><simpara>PDF version
-</simpara></listitem></varlistentry>
+<listitem><simpara>PDF version</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.10</para></refsect2>
-<refsect2 id="cairo-pdf-version-t" role="enum">
+<refsect2 id="cairo-pdf-version-t" role="enum" condition="since:1.10">
 <title>enum cairo_pdf_version_t</title>
-<indexterm zone="cairo-pdf-version-t"><primary sortas="pdf_version_t">cairo_pdf_version_t</primary></indexterm>
-<programlisting>typedef enum _cairo_pdf_version {
+<indexterm zone="cairo-pdf-version-t" role="1.10"><primary sortas="pdf_version_t">cairo_pdf_version_t</primary></indexterm>
+<programlisting>typedef enum {
     CAIRO_PDF_VERSION_1_4,
     CAIRO_PDF_VERSION_1_5
 } cairo_pdf_version_t;
@@ -160,21 +164,18 @@ surface.
 <para>
 <link linkend="cairo-pdf-version-t"><type>cairo_pdf_version_t</type></link> is used to describe the version number of the PDF
 specification that a generated PDF file will conform to.
-</para>
-<para>
-Since 1.10
 </para><variablelist role="enum">
 <varlistentry id="CAIRO-PDF-VERSION-1-4:CAPS" role="constant">
 <term><literal>CAIRO_PDF_VERSION_1_4</literal></term>
-<listitem><simpara>The version 1.4 of the PDF specification.
+<listitem><simpara>The version 1.4 of the PDF specification. (Since 1.10)
 </simpara></listitem>
 </varlistentry>
 <varlistentry id="CAIRO-PDF-VERSION-1-5:CAPS" role="constant">
 <term><literal>CAIRO_PDF_VERSION_1_5</literal></term>
-<listitem><simpara>The version 1.5 of the PDF specification.
+<listitem><simpara>The version 1.5 of the PDF specification. (Since 1.10)
 </simpara></listitem>
 </varlistentry>
-</variablelist></refsect2>
+</variablelist><para role="since">Since 1.10</para></refsect2>
 <refsect2 id="cairo-pdf-get-versions" role="function" condition="since:1.10">
 <title>cairo_pdf_get_versions ()</title>
 <indexterm zone="cairo-pdf-get-versions" role="1.10"><primary sortas="pdf_get_versions">cairo_pdf_get_versions</primary></indexterm>
@@ -185,11 +186,9 @@ Used to retrieve the list of supported versions. See
 <link linkend="cairo-pdf-surface-restrict-to-version"><function>cairo_pdf_surface_restrict_to_version()</function></link>.
 </para><variablelist role="params">
 <varlistentry><term><parameter>versions</parameter>&#160;:</term>
-<listitem><simpara>supported version list
-</simpara></listitem></varlistentry>
+<listitem><simpara>supported version list</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>num_versions</parameter>&#160;:</term>
-<listitem><simpara>list length
-</simpara></listitem></varlistentry>
+<listitem><simpara>list length</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.10</para></refsect2>
 <refsect2 id="cairo-pdf-version-to-string" role="function" condition="since:1.10">
 <title>cairo_pdf_version_to_string ()</title>
@@ -201,11 +200,8 @@ will return <link linkend="NULL:CAPS"><literal>NULL</literal></link> if <paramet
 for a way to get the list of valid version ids.
 </para><variablelist role="params">
 <varlistentry><term><parameter>version</parameter>&#160;:</term>
-<listitem><simpara>a version id
-</simpara></listitem></varlistentry>
-<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara> the string associated to given version.
-
-</simpara></listitem></varlistentry>
+<listitem><simpara>a version id</simpara></listitem></varlistentry>
+<varlistentry><term><emphasis>Returns</emphasis>&#160;:</term><listitem><simpara>the string associated to given version.</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.10</para></refsect2>
 <refsect2 id="cairo-pdf-surface-set-size" role="function" condition="since:1.2">
 <title>cairo_pdf_surface_set_size ()</title>
@@ -225,14 +221,11 @@ surface or immediately after completing a page with either
 <link linkend="cairo-show-page"><function>cairo_show_page()</function></link> or <link linkend="cairo-copy-page"><function>cairo_copy_page()</function></link>.
 </para><variablelist role="params">
 <varlistentry><term><parameter>surface</parameter>&#160;:</term>
-<listitem><simpara>a PDF <link linkend="cairo-surface-t"><type>cairo_surface_t</type></link>
-</simpara></listitem></varlistentry>
+<listitem><simpara>a PDF <link linkend="cairo-surface-t"><type>cairo_surface_t</type></link></simpara></listitem></varlistentry>
 <varlistentry><term><parameter>width_in_points</parameter>&#160;:</term>
-<listitem><simpara>new surface width, in points (1 point == 1/72.0 inch)
-</simpara></listitem></varlistentry>
+<listitem><simpara>new surface width, in points (1 point == 1/72.0 inch)</simpara></listitem></varlistentry>
 <varlistentry><term><parameter>height_in_points</parameter>&#160;:</term>
-<listitem><simpara>new surface height, in points (1 point == 1/72.0 inch)
-</simpara></listitem></varlistentry>
+<listitem><simpara>new surface height, in points (1 point == 1/72.0 inch)</simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.2</para></refsect2>
 
 </refsect1>

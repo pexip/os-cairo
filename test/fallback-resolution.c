@@ -33,6 +33,10 @@
 #include <stdlib.h>
 #include <cairo.h>
 
+#if CAIRO_HAS_PDF_SURFACE
+#include <cairo-pdf.h>
+#endif
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #include <errno.h>
@@ -270,6 +274,25 @@ generate_reference (double ppi_x, double ppi_y, const char *filename)
     cr = cairo_create (surface);
     cairo_surface_destroy (surface);
 
+    /* As we wish to mimic a PDF surface, copy across the default font options
+     * from the PDF backend.
+     */
+    {
+	cairo_surface_t *pdf;
+	cairo_font_options_t *options;
+
+	options = cairo_font_options_create ();
+
+#if CAIRO_HAS_PDF_SURFACE
+	pdf = cairo_pdf_surface_create ("tmp.pdf", 1, 1);
+	cairo_surface_get_font_options (pdf, options);
+	cairo_surface_destroy (pdf);
+#endif
+
+	cairo_set_font_options (cr, options);
+	cairo_font_options_destroy (options);
+    }
+
 #if SET_TOLERANCE
     cairo_set_tolerance (cr, 3.0);
 #endif
@@ -302,24 +325,7 @@ generate_reference (double ppi_x, double ppi_y, const char *filename)
 }
 #endif
 
-static cairo_bool_t
-_cairo_test_mkdir (const char *path)
-{
-#if ! HAVE_MKDIR
-    return FALSE;
-#elif HAVE_MKDIR == 1
-    if (mkdir (path) == 0)
-	return TRUE;
-#elif HAVE_MKDIR == 2
-    if (mkdir (path, 0770) == 0)
-	return TRUE;
-#else
-#error Bad value for HAVE_MKDIR
-#endif
-
-    return errno == EEXIST;
-}
-
+/* TODO: Split each ppi case out to its own CAIRO_TEST() test case */
 static cairo_test_status_t
 preamble (cairo_test_context_t *ctx)
 {
@@ -328,38 +334,30 @@ preamble (cairo_test_context_t *ctx)
     struct {
 	double x, y;
     } ppi[] = {
-	{ 600, 600 },
-	{ 600, 72 },
+	{ 576, 576 },
+	{ 576, 72 },
 
-	{ 300, 300 },
-	{ 300, 72 },
+	{ 288, 288 },
+	{ 288, 72 },
 
-	{ 150, 150 },
-	{ 150, 72 },
+	{ 144, 144 },
+	{ 144, 72 },
 
-	{ 75, 75 },
-	{ 75, 72 },
-
-	{ 72, 600 },
-	{ 72, 300 },
-	{ 72, 150 },
-	{ 72, 75 },
+	{ 72, 576 },
+	{ 72, 288 },
+	{ 72, 144 },
 	{ 72, 72 },
-	{ 72, 37.5 },
-
-	{ 37.5, 72 },
-	{ 37.5, 37.5 },
     };
     unsigned int i;
     int n, num_ppi;
-    const char *path = _cairo_test_mkdir (CAIRO_TEST_OUTPUT_DIR) ? CAIRO_TEST_OUTPUT_DIR : ".";
+    const char *path = cairo_test_mkdir (CAIRO_TEST_OUTPUT_DIR) ? CAIRO_TEST_OUTPUT_DIR : ".";
 
-    num_ppi = sizeof (ppi) / sizeof (ppi[0]);
+    num_ppi = ARRAY_LENGTH (ppi);
 
 #if GENERATE_REFERENCE
     for (n = 0; n < num_ppi; n++) {
 	char *ref_name;
-	xasprintf (&ref_name, "fallback-resolution.ppi%gx%g.ref.png",
+	xasprintf (&ref_name, "reference/fallback-resolution.ppi%gx%g.ref.png",
 		   ppi[n].x, ppi[n].y);
 	generate_reference (ppi[n].x, ppi[n].y, ref_name);
 	free (ref_name);
@@ -390,7 +388,6 @@ preamble (cairo_test_context_t *ctx)
 					    SIZE, SIZE,
 					    SIZE, SIZE,
 					    CAIRO_BOILERPLATE_MODE_TEST,
-					    0,
 					    &closure);
 
 	if (surface == NULL) {
@@ -425,7 +422,6 @@ preamble (cairo_test_context_t *ctx)
 						SIZE + 25, SIZE + 25,
 						SIZE + 25, SIZE + 25,
 						CAIRO_BOILERPLATE_MODE_TEST,
-						0,
 						&closure);
 	    if (surface == NULL || cairo_surface_status (surface)) {
 		cairo_test_log (ctx, "Failed to generate surface: %s.%s\n",
@@ -444,15 +440,13 @@ preamble (cairo_test_context_t *ctx)
 	    fflush (stdout);
 
 	    if (target->force_fallbacks != NULL)
-		target->force_fallbacks (surface, ~0U);
+		target->force_fallbacks (surface, ppi[n].x, ppi[n].y);
 	    cr = cairo_create (surface);
 #if SET_TOLERANCE
 	    cairo_set_tolerance (cr, 3.0);
 #endif
 
 	    cairo_surface_set_device_offset (surface, 25, 25);
-	    cairo_surface_set_fallback_resolution (surface,
-						   ppi[n].x, ppi[n].y);
 
 	    cairo_save (cr); {
 		cairo_set_source_rgb (cr, 1, 1, 1);

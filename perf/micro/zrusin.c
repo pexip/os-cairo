@@ -33,18 +33,16 @@ typedef struct {
 
 #include "zrusin-another.h"
 
-#define ARRAY_SIZE(arr) sizeof(arr)/sizeof(arr[0])
-
 static void
 zrusin_another_path (cairo_t *cr)
 {
     unsigned int i;
 
-    for (i=0; i < ARRAY_SIZE (zrusin_another); i++)
+    for (i=0; i < ARRAY_LENGTH (zrusin_another); i++)
 	cairo_line_to (cr, zrusin_another[i].x, zrusin_another[i].y);
 }
 
-static cairo_perf_ticks_t
+static cairo_time_t
 zrusin_another_tessellate (cairo_t *cr, int width, int height, int loops)
 {
     zrusin_another_path (cr);
@@ -66,7 +64,7 @@ zrusin_another_tessellate (cairo_t *cr, int width, int height, int loops)
     return cairo_perf_timer_elapsed ();
 }
 
-static cairo_perf_ticks_t
+static cairo_time_t
 zrusin_another_fill (cairo_t *cr, int width, int height, int loops)
 {
     zrusin_another_path (cr);
@@ -84,11 +82,15 @@ zrusin_another_fill (cairo_t *cr, int width, int height, int loops)
     return cairo_perf_timer_elapsed ();
 }
 
+cairo_bool_t
+zrusin_enabled (cairo_perf_t *perf)
+{
+    return cairo_perf_can_run (perf, "zrusin", NULL);
+}
+
 void
 zrusin (cairo_perf_t *perf, cairo_t *cr, int width, int height)
 {
-    if (! cairo_perf_can_run (perf, "zrusin", NULL))
-	return;
 
     cairo_perf_run (perf, "zrusin-another-tessellate", zrusin_another_tessellate, NULL);
     cairo_perf_run (perf, "zrusin-another-fill", zrusin_another_fill, NULL);

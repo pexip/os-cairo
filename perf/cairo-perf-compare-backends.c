@@ -73,7 +73,7 @@ print_change_bar (double change,
 		  double max_change,
 		  int	 use_utf)
 {
-    int units_per_cell = (int) ceil (max_change / CHANGE_BAR_WIDTH);
+    int units_per_cell = ceil (max_change / CHANGE_BAR_WIDTH);
     static char const *ascii_boxes[8] = {
 	"****","***" ,"***", "**",
 	"**",  "*",   "*",   ""
@@ -111,8 +111,6 @@ print_change_bar (double change,
 	printf ("%s", boxes[6]);
     else if (change > 0.5/8.0)
 	printf ("%s", boxes[7]);
-
-    printf ("\n");
 }
 
 static void
@@ -145,12 +143,12 @@ test_diff_print (test_diff_t		     *diff,
 
 	if (options->print_change_bars)
 	    print_change_bar (change, max_change, options->use_utf);
+	printf ("\n");
     }
 
     printf("\n");
 }
 
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
 static void
 cairo_perf_reports_compare (cairo_perf_report_t 	*reports,
 			    int 			 num_reports,
@@ -300,7 +298,7 @@ usage (const char *argv0)
 	     "--no-bars   Don't display change bars at all.\n\n"
 	     "\n"
 	     "--use-ms    Use milliseconds to calculate differences.\n"
-	     "            (instead of ticks which are hardware dependant)\n"
+	     "            (instead of ticks which are hardware dependent)\n"
 	     "\n"
 	     "--min-change threshold[%%]\n"
 	     "            Suppress all changes below the given threshold.\n"
@@ -370,7 +368,7 @@ main (int	  argc,
     if (args.num_filenames) {
 	reports = xcalloc (args.num_filenames, sizeof (cairo_perf_report_t));
 	for (i = 0; i < args.num_filenames; i++) {
-	    cairo_perf_report_load (&reports[i], args.filenames[i],
+	    cairo_perf_report_load (&reports[i], args.filenames[i], i,
 				    test_report_cmp_name);
 	    printf ("loaded: %s, %d tests\n",
 		    args.filenames[i], reports[i].tests_count);
@@ -378,7 +376,7 @@ main (int	  argc,
     } else {
 	args.num_filenames = 1;
 	reports = xcalloc (args.num_filenames, sizeof (cairo_perf_report_t));
-	cairo_perf_report_load (&reports[0], NULL, test_report_cmp_name);
+	cairo_perf_report_load (&reports[0], NULL, 0, test_report_cmp_name);
     }
 
     cairo_perf_reports_compare (reports, args.num_filenames, &args.options);

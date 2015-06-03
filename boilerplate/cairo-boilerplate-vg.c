@@ -78,7 +78,6 @@ _cairo_boilerplate_vg_create_surface_glx (const char		    *name,
 					  double		     max_width,
 					  double		     max_height,
 					  cairo_boilerplate_mode_t   mode,
-					  int			     id,
 					  void			   **closure)
 {
     int rgba_attribs[] = {
@@ -88,7 +87,7 @@ _cairo_boilerplate_vg_create_surface_glx (const char		    *name,
 	GLX_BLUE_SIZE, 1,
 	GLX_ALPHA_SIZE, 1,
 	GLX_DOUBLEBUFFER,
-	None
+	GLX_NONE
     };
     int rgb_attribs[] = {
 	GLX_RGBA,
@@ -96,7 +95,7 @@ _cairo_boilerplate_vg_create_surface_glx (const char		    *name,
 	GLX_GREEN_SIZE, 1,
 	GLX_BLUE_SIZE, 1,
 	GLX_DOUBLEBUFFER,
-	None
+	GLX_NONE
     };
     XVisualInfo *vi;
     Display *dpy;
@@ -207,7 +206,6 @@ _cairo_boilerplate_vg_create_surface_egl (const char		    *name,
 					  double		     max_width,
 					  double		     max_height,
 					  cairo_boilerplate_mode_t   mode,
-					  int			     id,
 					  void			   **closure)
 {
     int rgba_attribs[] = {
@@ -217,7 +215,7 @@ _cairo_boilerplate_vg_create_surface_egl (const char		    *name,
 	EGL_ALPHA_SIZE, 8,
 	EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
 	EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
-	None
+	EGL_NONE
     };
     int rgb_attribs[] = {
 	EGL_RED_SIZE, 8,
@@ -227,7 +225,7 @@ _cairo_boilerplate_vg_create_surface_egl (const char		    *name,
 	EGL_VG_ALPHA_FORMAT, EGL_VG_ALPHA_FORMAT_PRE_BIT,
 	EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
 	EGL_RENDERABLE_TYPE, EGL_OPENVG_BIT,
-	None
+	EGL_NONE
     };
     int dummy_attribs[] = {
 	EGL_WIDTH, 8, EGL_HEIGHT, 8,
@@ -307,6 +305,7 @@ static const cairo_boilerplate_target_t targets[] = {
 	CAIRO_SURFACE_TYPE_VG, CAIRO_CONTENT_COLOR_ALPHA, 1,
 	"cairo_vg_context_create_for_glx",
 	_cairo_boilerplate_vg_create_surface_glx,
+	cairo_surface_create_similar,
 	NULL, NULL,
 	_cairo_boilerplate_get_image_surface,
 	cairo_surface_write_to_png,
@@ -320,6 +319,7 @@ static const cairo_boilerplate_target_t targets[] = {
 	CAIRO_SURFACE_TYPE_VG, CAIRO_CONTENT_COLOR, 1,
 	"cairo_vg_context_create_for_glx",
 	_cairo_boilerplate_vg_create_surface_glx,
+	cairo_surface_create_similar,
 	NULL, NULL,
 	_cairo_boilerplate_get_image_surface,
 	cairo_surface_write_to_png,
@@ -335,6 +335,7 @@ static const cairo_boilerplate_target_t targets[] = {
 	CAIRO_SURFACE_TYPE_VG, CAIRO_CONTENT_COLOR_ALPHA, 1,
 	"cairo_vg_context_create_for_egl",
 	_cairo_boilerplate_vg_create_surface_egl,
+	cairo_surface_create_similar,
 	NULL, NULL,
 	_cairo_boilerplate_get_image_surface,
 	cairo_surface_write_to_png,
@@ -348,6 +349,7 @@ static const cairo_boilerplate_target_t targets[] = {
 	CAIRO_SURFACE_TYPE_VG, CAIRO_CONTENT_COLOR, 1,
 	"cairo_vg_context_create_for_egl",
 	_cairo_boilerplate_vg_create_surface_egl,
+	cairo_surface_create_similar,
 	NULL, NULL,
 	_cairo_boilerplate_get_image_surface,
 	cairo_surface_write_to_png,

@@ -9,12 +9,10 @@ cairo-recording
 
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
@@ -49,5 +47,15 @@ cairo-recording
 @y0: 
 @width: 
 @height: 
+
+
+<!-- ##### FUNCTION cairo_recording_surface_get_extents ##### -->
+<para>
+
+</para>
+
+@surface: 
+@extents: 
+@Returns: 
 
 

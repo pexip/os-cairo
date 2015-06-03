@@ -62,6 +62,26 @@ typedef unsigned __int64 uint64_t;
 
 #endif
 
+#if HAVE_FENV_H
+# include <fenv.h>
+#endif
+/* The following are optional in C99, so define them if they aren't yet */
+#ifndef FE_DIVBYZERO
+#define FE_DIVBYZERO 0
+#endif
+#ifndef FE_INEXACT
+#define FE_INEXACT 0
+#endif
+#ifndef FE_INVALID
+#define FE_INVALID 0
+#endif
+#ifndef FE_OVERFLOW
+#define FE_OVERFLOW 0
+#endif
+#ifndef FE_UNDERFLOW
+#define FE_UNDERFLOW 0
+#endif
+
 #include <math.h>
 
 static inline double
@@ -78,6 +98,18 @@ cairo_test_NaN (void)
     return strtod("NaN", NULL);
 #endif
 }
+
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
+#ifndef MAX
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef ARRAY_LENGTH
+#define ARRAY_LENGTH(__array) ((int) (sizeof (__array) / sizeof (__array[0])))
+#endif
 
 #define CAIRO_TEST_OUTPUT_DIR "output"
 
@@ -141,7 +173,6 @@ typedef cairo_test_status_t
 (cairo_test_draw_function_t) (cairo_t *cr, int width, int height);
 
 struct _cairo_test {
-    struct _cairo_test *next;
     const char *name;
     const char *description;
     const char *keywords;
@@ -182,7 +213,7 @@ struct _cairo_test {
 void _register_##name (void); \
 void _register_##name (void) { \
     static cairo_test_t test = { \
-	NULL, #name, description, \
+	#name, description, \
 	keywords, requirements, \
 	width, height, \
 	preamble, draw \
@@ -208,6 +239,7 @@ struct _cairo_test_context {
     const char *test_name;
 
     FILE *log_file;
+    const char *output;
     const char *srcdir; /* directory containing sources and input data */
     const char *refdir; /* directory containing reference images */
 
@@ -224,8 +256,6 @@ struct _cairo_test_context {
     int last_fault_count;
 
     int timeout;
-
-    int thread;
 };
 
 /* Retrieve the test context from the cairo_t, used for logging, paths etc */
@@ -240,10 +270,6 @@ cairo_test_log (const cairo_test_context_t *ctx,
 void
 cairo_test_logv (const cairo_test_context_t *ctx,
 	        const char *fmt, va_list ap) CAIRO_BOILERPLATE_PRINTF_FORMAT(2, 0);
-
-void
-cairo_test_log_path (const cairo_test_context_t *ctx,
-		     const cairo_path_t *path);
 
 /* Helper functions that take care of finding source images even when
  * building in a non-srcdir manner, (i.e. the tests will be run in a
@@ -291,6 +317,9 @@ cairo_surface_t *
 cairo_test_get_reference_image (cairo_test_context_t *ctx,
 				const char *filename,
 				cairo_bool_t flatten);
+
+cairo_bool_t
+cairo_test_mkdir (const char *path);
 
 CAIRO_END_DECLS
 

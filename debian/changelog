@@ -1,17 +1,55 @@
-cairo (1.14.0-2.1+deb8u2) jessie; urgency=medium
+cairo (1.14.8-1) unstable; urgency=medium
+
+  * Acknowledge NMU, thanks Salvatore.
+  * New upstream release.
+  * Switch URLs to https.
+  * Switch to -dbgsym packages.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Wed, 14 Dec 2016 00:13:33 +0100
+
+cairo (1.14.6-1.1) unstable; urgency=medium
 
   * Non-maintainer upload.
   * CVE-2016-9082: DoS attack based on using SVG to generate invalid pointers
-    from a _cairo_image_surface in write_png.
-    (Closes: #842289)
+    from a _cairo_image_surface in write_png.  (Closes: #842289)
 
- -- Salvatore Bonaccorso <carnil@debian.org>  Fri, 30 Dec 2016 07:30:39 +0100
+ -- Salvatore Bonaccorso <carnil@debian.org>  Sun, 30 Oct 2016 13:25:37 +0100
 
-cairo (1.14.0-2.1+deb8u1) jessie; urgency=medium
+cairo (1.14.6-1) unstable; urgency=medium
 
-  * Fix CVE-2016-3190
+  * New upstream release.
 
- -- Moritz Mühlenhoff <jmm@debian.org>  Sat, 19 Mar 2016 22:37:18 +0100
+ -- Michael Biebl <biebl@debian.org>  Sat, 09 Jan 2016 22:36:29 +0100
+
+cairo (1.14.4-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh debian/patches/06_hurd-map-noreserve.patch.
+  * Drop obsolete debian/libcairo2.install.opt file, we no longer support
+    building an optimized flavor.
+  * Drop obsolete XS-Testsuite field. This is no longer necessary with recent
+    versions of dpkg.
+  * Use https:// for Vcs-Browser.
+
+ -- Michael Biebl <biebl@debian.org>  Fri, 30 Oct 2015 09:15:44 +0100
+
+cairo (1.14.2-2) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Michael Biebl <biebl@debian.org>  Thu, 14 May 2015 01:51:07 +0200
+
+cairo (1.14.2-1) experimental; urgency=medium
+
+  * Update gbp.conf for experimental
+  * New upstream version 1.14.2
+    - pdf-operators: Only wrap text strings for PS output: should fix
+      formatting of some PDFs (LP: #657094)
+  * Drop patches applied upstream in this release
+    - 0005-CFF-Fix-unaligned-access.patch
+    - 0008-tor-scan-converter-can-t-do_fullrow-when-intersectio.patch
+
+ -- Iain Lane <laney@debian.org>  Wed, 08 Apr 2015 12:28:35 +0100
 
 cairo (1.14.0-2.1) unstable; urgency=medium
 

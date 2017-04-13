@@ -1,3 +1,10 @@
+cairo (1.14.0-2.1+deb8u1pexip2) pexip; urgency=low
+
+  * debian/control: resync with Debian -- no need for specific
+    libx11-dev build-dep now
+
+ -- John-Mark Bell <jmb@pexip.com>  Thu, 13 Apr 2017 15:43:01 +0100
+
 cairo (1.14.0-2.1+deb8u1pexip1) pexip; urgency=low
 
   * New upstream release

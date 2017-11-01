@@ -1,3 +1,9 @@
+cairo (1.14.0-2.1+deb8u2pexip2) pexip; urgency=low
+
+  * Add upstream fix for initialisation race. Fixes pexip issue 10843
+
+ -- Vincent Sanders <vince@pexip.com>  Tue, 31 Oct 2017 10:49:26 +0000
+
 cairo (1.14.0-2.1+deb8u2pexip1) pexip; urgency=low
 
   * New upstream release

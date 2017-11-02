@@ -1,3 +1,9 @@
+cairo (1.14.0-2.1+deb8u2pexip3) pexip; urgency=low
+
+  * Back out patch in pexip2 -- it appears to reliably deadlock.
+
+ -- John-Mark Bell <jmb@pexip.com>  Thu, 02 Nov 2017 21:28:37 +0000
+
 cairo (1.14.0-2.1+deb8u2pexip2) pexip; urgency=low
 
   * Add upstream fix for initialisation race. Fixes pexip issue 10843

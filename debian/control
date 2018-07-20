@@ -28,9 +28,9 @@ Build-Depends: debhelper (>= 9),
                zlib1g-dev,
                liblzo2-dev
 Standards-Version: 3.9.6
-Vcs-Git: git://anonscm.debian.org/collab-maint/cairo.git
-Vcs-Browser: http://anonscm.debian.org/cgit/collab-maint/cairo.git
-Homepage: http://cairographics.org/
+Vcs-Git: https://anonscm.debian.org/git/collab-maint/cairo.git
+Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/cairo.git
+Homepage: https://cairographics.org/
 XS-Pexip-Upstream: http://ftp.debian.org/debian/ stretch
 
 Package: libcairo2-dev
@@ -55,7 +55,6 @@ Depends: libcairo2 (= ${binary:Version}),
          ${misc:Depends}
 Provides: libcairo-dev
 Suggests: libcairo2-doc
-XS-Testsuite: autopkgtest
 Description: Development files for the Cairo 2D graphics library
  Cairo is a multi-platform library providing anti-aliased
  vector-based rendering for multiple target backends.
@@ -90,20 +89,6 @@ Description: Cairo 2D vector graphics library
  PDF 1.4.
  .
  This package contains the shared libraries.
-
-Package: libcairo2-dbg
-Section: debug
-Priority: extra
-Architecture: any
-Depends: libcairo2 (= ${binary:Version}),
-         ${misc:Depends}
-Suggests: libcairo-gobject2 (= ${binary:Version}),
-          libcairo-script-interpreter2 (= ${binary:Version}),
-          cairo-perf-utils (= ${binary:Version})
-Multi-Arch: same
-Description: Cairo 2D vector graphics library (debugging symbols)
- Debugging symbols for the Cairo 2D vector graphics library. This is
- needed to debug programs linked against libcairo2.
 
 Package: libcairo2-doc
 Section: doc

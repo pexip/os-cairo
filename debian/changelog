@@ -1,3 +1,112 @@
+cairo (1.16.0-4) unstable; urgency=medium
+
+  * Team upload
+  * d/p/ft-Use-FT_Done_MM_Var-instead-of-free-when-available-in-c.patch:
+    Apply patch to fix memory corruption with packages that set their
+    own memory allocator, such as WebKitGTK+.
+    (Closes: #915801, CVE-2018-19876)
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 15 Mar 2019 07:57:56 +0000
+
+cairo (1.16.0-3) unstable; urgency=medium
+
+  * debian/patches/git-pdf-add-missing-flush.patch:
+    - backport patch to fix corrupted pdf exports/prints
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 22 Feb 2019 15:07:18 +0100
+
+cairo (1.16.0-2) unstable; urgency=medium
+
+  * Restore -Wl,-O1 to our LDFLAGS
+  * Bump Standards-Version to 4.3.0
+
+ -- Jeremy Bicha <jbicha@debian.org>  Sun, 23 Dec 2018 18:02:09 -0500
+
+cairo (1.16.0-1) unstable; urgency=medium
+
+  * New upstream release
+  * debian/watch: watch for stable releases
+  * Drop 0005-Fix-assertion-failure-in-the-freetype-backend.patch:
+    - Applied in new release
+
+ -- Jeremy Bicha <jbicha@debian.org>  Sat, 20 Oct 2018 09:36:36 -0400
+
+cairo (1.15.12-1) unstable; urgency=medium
+
+  * New upstream snapshot release
+  * debian/libcairo2.symbols: Add new symbols
+  * Drop 0005-Revert-fix-warning-variable-X.patch: Applied in new release
+  * Cherry-pick 0005-Fix-assertion-failure-in-the-freetype-backend.patch
+  * Bump Standards-Version to 4.1.4
+  * Build with all hardening flags
+  * Minor update to debian/watch
+  * Update debian/gbp.conf
+
+ -- Jeremy Bicha <jbicha@debian.org>  Thu, 23 Aug 2018 20:05:13 -0400
+
+cairo (1.15.10-3) unstable; urgency=medium
+
+  * Disable the test suite (enabled in 1.15.10-2). The test results were
+    ignored anyway, and the test suite is quite broken at the moment so
+    we won't be able to make the results fatal anytime soon. Furthermore,
+    there's only one mega-test that runs all the smaller tests, and this
+    causes automake to emit no output until the one test is done, making
+    the build fail on builders with no FPU due to inactivity.
+    Closes: #891547.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Wed, 18 Apr 2018 18:07:55 +0200
+
+cairo (1.15.10-2) unstable; urgency=medium
+
+  * Cherry-pick 0005-Revert-fix-warning-variable-X.patch:
+    Fix libcairo-perl autopkgtest regression. Thanks Niko Tyni
+    for identifying the fix. (Closes: #889471)
+  * Mark libcairo2-dev as Multi-Arch: same (Closes: #689122) and
+    libcairo2-doc as Multi-Arch: foreign (Closes: #884167)
+
+ -- Jeremy Bicha <jbicha@debian.org>  Sun, 25 Feb 2018 08:01:14 -0500
+
+cairo (1.15.10-1) unstable; urgency=medium
+
+  * New upstream snapshot release
+  * Update Vcs fields for migration to https://salsa.debian.org/
+  * debian/libcairo2.symbols: Add new symbols
+  * Drop 07_CVE-2016-9082.patch: Applied in new release
+  * Refresh patches
+
+ -- Jeremy Bicha <jbicha@debian.org>  Fri, 02 Feb 2018 14:39:52 -0500
+
+cairo (1.15.8-3) unstable; urgency=medium
+
+  * Update Vcs fields and gbp.conf for Debian GNOME team conventions
+  * Bump debhelper compat to 11
+  * Bump Standards-Version to 4.1.2
+
+ -- Jeremy Bicha <jbicha@debian.org>  Thu, 21 Dec 2017 13:39:22 -0500
+
+cairo (1.15.8-2) unstable; urgency=medium
+
+  * Team upload.
+  * Upload to unstable
+
+ -- Laurent Bigonville <bigon@debian.org>  Wed, 25 Oct 2017 15:08:05 +0200
+
+cairo (1.15.8-1) experimental; urgency=medium
+
+  * Team upload.
+  * New upstream snapshot release (LP: #1598589)
+    - debian/libcairo2.symbols: Add newly exported symbols
+  * Bump Standards-Version to 4.1.1 (no further changes)
+
+ -- Laurent Bigonville <bigon@debian.org>  Tue, 17 Oct 2017 18:21:16 +0200
+
+cairo (1.14.10-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream version 1.14.10
+
+ -- Andreas Henriksson <andreas@fatal.se>  Sat, 01 Jul 2017 12:02:13 +0200
+
 cairo (1.14.8-1) unstable; urgency=medium
 
   * Acknowledge NMU, thanks Salvatore.
@@ -579,7 +688,7 @@ cairo (1.9.6-3) experimental; urgency=low
   * debian/control:
     + Depend on libxcb-shm0-dev as required by the pkg-config
       file (Closes: #572119).
-    + Update dependency versions as requested by the pkg-config files.      
+    + Update dependency versions as requested by the pkg-config files.
 
  -- Sebastian Dröge <slomo@debian.org>  Mon, 01 Mar 2010 18:55:01 +0100
 
@@ -707,12 +816,12 @@ cairo (1.8.2-2) experimental; urgency=low
 cairo (1.6.4-6.1) unstable; urgency=low
 
   * Non-maintainer upload.
-  * Remove the rpath stuff in /usr/lib/libcairo-directdb and only keep 
+  * Remove the rpath stuff in /usr/lib/libcairo-directdb and only keep
     it around for compatibility. Closes: #499662.
     + Remove the rpath hack in the .pc file.
-    + Make the libcairo-directfb2{,dev} packages dummy, only keeping 
+    + Make the libcairo-directfb2{,dev} packages dummy, only keeping
       symbolic links from the former locations.
-    + libcairo-directfb2-dev.postinst: do the symbolic link dance upon 
+    + libcairo-directfb2-dev.postinst: do the symbolic link dance upon
       upgrade.
     + Update package descriptions accordingly.
     + libcairo2.symbols: add cairo_directfb_surface_create.
@@ -817,7 +926,7 @@ cairo (1.6.4-2) unstable; urgency=low
 
   * debian/patches/01_directfb-no-accel.dpatch:
     + Disable rendering acceleration for the DirectFB backend as it
-      causes broken screen repainting with the Debian installer 
+      causes broken screen repainting with the Debian installer
       and other GTK/DirectFB applications (Closes: #477331).
 
  -- Sebastian Dröge <slomo@debian.org>  Tue, 13 May 2008 10:34:26 +0200
@@ -1014,7 +1123,7 @@ libcairo (1.2.4-3.1) unstable; urgency=low
     by a broken loop condition (c >= 0 works like, eh, always after
     doing "unsigned int c"...). (Closes: #388116)
 
- -- Marc 'HE' Brockschmidt <he@debian.org>  Sun, 15 Oct 2006 16:25:06 +0200 
+ -- Marc 'HE' Brockschmidt <he@debian.org>  Sun, 15 Oct 2006 16:25:06 +0200
 
 libcairo (1.2.4-3) experimental; urgency=low
 
@@ -1132,7 +1241,7 @@ libcairo (1.1.6-1) experimental; urgency=low
   * Added Cairo DirectFB udeb packages libcairo2-directfb-udeb and
     libcairo2-directfb-dev (add Build-Depend: on libdirectfb-dev)
   * libcairo2-dev and libcairo2-directfb-dev can both be installed together
-  * Stop using CDBS since it cannot handle the double configure and build 
+  * Stop using CDBS since it cannot handle the double configure and build
     setup.
   * Use dpatch for patching and Build-Depend: on it.
 
@@ -1427,4 +1536,3 @@ libcairo (0.1.8-1) unstable; urgency=low
   * Initial package
 
  -- Dave Beckett <Dave.Beckett@bristol.ac.uk>  Wed, 29 Oct 2003 23:20:26 +0000
-

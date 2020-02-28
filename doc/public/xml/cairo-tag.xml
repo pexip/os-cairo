@@ -1,15 +1,13 @@
-<?xml version='1.0' encoding='UTF-8'?> 
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-                "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+		"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
 <!ENTITY version SYSTEM "version.xml">
 ]>
 <refentry id="cairo-Tags-and-Links">
 <refmeta>
 <refentrytitle role="top_of_page" id="cairo-Tags-and-Links.top_of_page">Tags and Links</refentrytitle>
 <manvolnum>3</manvolnum>
-<refmiscinfo>
-  CAIRO Library
-</refmiscinfo>
+<refmiscinfo>CAIRO Library</refmiscinfo>
 </refmeta>
 <refnamediv>
 <refname>Tags and Links</refname>
@@ -46,11 +44,6 @@
 </tgroup>
 </informaltable>
 </refsect1>
-<refsect1 id="cairo-Tags-and-Links.object-hierarchy" role="object_hierarchy">
-<title role="object_hierarchy.title">Object Hierarchy</title>
-<screen>
-</screen>
-</refsect1>
 
 
 <refsect1 id="cairo-Tags-and-Links.description" role="desc">
@@ -67,7 +60,7 @@ document logical structure on supported backends. The following tags are support
 <refsect2 id="link"><title>Link Tags</title><para>A hyperlink is specified by enclosing the hyperlink text with the <link linkend="CAIRO-TAG-LINK:CAPS"><literal>CAIRO_TAG_LINK</literal></link> tag.</para>
 <para>For example:</para>
 <informalexample><programlisting>
-cairo_tag_begin (cr, CAIRO_TAG_LINK, "uri='http://cairographics.org'");
+cairo_tag_begin (cr, CAIRO_TAG_LINK, "uri='https://cairographics.org'");
 cairo_move_to (cr, 50, 50);
 cairo_show_text (cr, "This is a link to the cairo website.");
 cairo_tag_end (cr, CAIRO_TAG_LINK);
@@ -98,7 +91,7 @@ cairo_text_extents (cr, text1, &amp;text1_extents);
 cairo_move_to (cr, 50, 70);
 cairo_text_extents (cr, text2, &amp;text2_extents);
 sprintf (attribs,
-         "rect=[%f %f %f %f %f %f %f %f] uri='http://cairographics.org'",
+         "rect=[%f %f %f %f %f %f %f %f] uri='https://cairographics.org'",
          text1_extents.x_bearing,
          text1_extents.y_bearing,
          text1_extents.width,
@@ -134,7 +127,7 @@ to. Destinations are created with the <link linkend="CAIRO-TAG-DEST:CAPS"><liter
 : An integer specifying the page number in the PDF file to link to.</para>
 <para><parameter>pos</parameter>
 : [optional] An array of two floats specifying the x,y position
-on the page. Default is 0,0.</para>
+on the page.</para>
 <para>An example of the link attributes to link to a page and x,y position:</para>
 <programlisting>
 "page=3 pos=[3.1 6.2]"
@@ -146,7 +139,7 @@ on the page. Default is 0,0.</para>
 : An ASCII string specifying the URI.</para>
 <para>An example of the link attributes to the cairo website:</para>
 <programlisting>
-"uri='http://cairographics.org'"
+"uri='https://cairographics.org'"
 </programlisting>
 </refsect3>
 <refsect3 id="file-link"><title>File Links</title><para>A file link is a link a location in another PDF file.</para>
@@ -160,8 +153,9 @@ on the page. Default is 0,0.</para>
 <para> <parameter>page</parameter>
 : An integer specifying the page number in the PDF file.</para>
 <para> <parameter>pos</parameter>
-: [optional] An array of two floats specifying the x,y position
- on the page. Default is 0,0.</para>
+: [optional] An array of two floats specifying the x,y
+ position on the page. Position coordinates in external files are in PDF
+ coordinates (0,0 at bottom left).</para>
 <para>An example of the link attributes to PDF file:</para>
 <programlisting>
 "file='document.pdf' page=16 pos=[25 40]"
@@ -186,7 +180,7 @@ operations with the <link linkend="CAIRO-TAG-DEST:CAPS"><literal>CAIRO_TAG_DEST<
                 no operations are enclosed, the y coordidate is 0.</para>
 <para><parameter>internal</parameter>
 : A boolean that if true, the destination name may be
-           ommitted from PDF where possible. In this case, links
+           omitted from PDF where possible. In this case, links
            refer directly to the page and position instead of via
            the named destination table. Note that if this
            destination is referenced by another PDF (see <link linkend="file-link">File Links</link>),
@@ -206,11 +200,11 @@ cairo_tag_end (cr, CAIRO_TAG_DEST);
 </programlisting></informalexample>
 </refsect2>
 <refsect2 id="doc-struct"><title>Document Structure (PDF)</title><para>The document structure tags provide a means of specifying structural information
-such as headers, paragraphs, tables, and figures. The inclusion of structural information faciliates:</para>
+such as headers, paragraphs, tables, and figures. The inclusion of structural information facilitates:</para>
 <itemizedlist>
 <listitem><para>Extraction of text and graphics for copy and paste</para></listitem>
 <listitem><para>Reflow of text and graphics in the viewer</para></listitem>
-<listitem><para>Proccessing text eg searching and indexing</para></listitem>
+<listitem><para>Processing text eg searching and indexing</para></listitem>
 <listitem><para>Conversion to other formats</para></listitem>
 <listitem>
 <para>Accessability support</para>
@@ -281,7 +275,7 @@ for the list of tags and attributes.</para>
  to
 shutdown with a status of <link linkend="CAIRO-STATUS-TAG-ERROR:CAPS"><literal>CAIRO_STATUS_TAG_ERROR</literal></link>.</para>
 <para>See <link linkend="cairo-tag-end"><function>cairo_tag_end()</function></link>.</para>
-<refsect3 role="parameters">
+<refsect3 id="cairo-tag-begin.parameters" role="parameters">
 <title>Parameters</title>
 <informaltable role="parameters_table" pgwide="1" frame="none">
 <tgroup cols="3">
@@ -299,7 +293,7 @@ shutdown with a status of <link linkend="CAIRO-STATUS-TAG-ERROR:CAPS"><literal>C
 <entry role="parameter_description"><para>tag attributes</para></entry>
 <entry role="parameter_annotations"></entry></row>
 </tbody></tgroup></informaltable>
-</refsect3><para role="since">Since 1.16</para></refsect2>
+</refsect3><para role="since">Since: <link linkend="api-index-1.16">1.16</link></para></refsect2>
 <refsect2 id="cairo-tag-end" role="function" condition="since:1.16">
 <title>cairo_tag_end&#160;()</title>
 <indexterm zone="cairo-tag-end" role="1.16"><primary sortas="tag_end">cairo_tag_end</primary></indexterm>
@@ -312,7 +306,7 @@ cairo_tag_end (<parameter><link linkend="cairo-t"><type>cairo_t</type></link> *c
  to shutdown with a status of
 <link linkend="CAIRO-STATUS-TAG-ERROR:CAPS"><literal>CAIRO_STATUS_TAG_ERROR</literal></link>.</para>
 <para>See <link linkend="cairo-tag-begin"><function>cairo_tag_begin()</function></link>.</para>
-<refsect3 role="parameters">
+<refsect3 id="cairo-tag-end.parameters" role="parameters">
 <title>Parameters</title>
 <informaltable role="parameters_table" pgwide="1" frame="none">
 <tgroup cols="3">
@@ -327,7 +321,7 @@ cairo_tag_end (<parameter><link linkend="cairo-t"><type>cairo_t</type></link> *c
 <entry role="parameter_description"><para>tag name</para></entry>
 <entry role="parameter_annotations"></entry></row>
 </tbody></tgroup></informaltable>
-</refsect3><para role="since">Since 1.16</para></refsect2>
+</refsect3><para role="since">Since: <link linkend="api-index-1.16">1.16</link></para></refsect2>
 
 </refsect1>
 <refsect1 id="cairo-Tags-and-Links.other_details" role="details">
@@ -339,7 +333,7 @@ cairo_tag_end (<parameter><link linkend="cairo-t"><type>cairo_t</type></link> *c
 </programlisting>
 <para>Create a destination for a hyperlink. Destination tag attributes
 are detailed at <link linkend="dests">Destinations</link>.</para>
-<para role="since">Since 1.16</para></refsect2>
+<para role="since">Since: <link linkend="api-index-1.16">1.16</link></para></refsect2>
 <refsect2 id="CAIRO-TAG-LINK:CAPS" role="macro" condition="since:1.16">
 <title>CAIRO_TAG_LINK</title>
 <indexterm zone="CAIRO-TAG-LINK:CAPS" role="1.16"><primary sortas="TAG_LINK">CAIRO_TAG_LINK</primary></indexterm>
@@ -347,7 +341,7 @@ are detailed at <link linkend="dests">Destinations</link>.</para>
 </programlisting>
 <para>Create hyperlink. Link tag attributes are detailed at
 <link linkend="links">Links</link>.</para>
-<para role="since">Since 1.16</para></refsect2>
+<para role="since">Since: <link linkend="api-index-1.16">1.16</link></para></refsect2>
 
 </refsect1>
 <refsect1 id="cairo-Tags-and-Links.see-also">

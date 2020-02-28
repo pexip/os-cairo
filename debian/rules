@@ -1,14 +1,11 @@
 #!/usr/bin/make -f
 
-#export DH_VERBOSE=1
-#export DEB_BUILD_OPTIONS="nostrip"
-
-#export DEB_BUILD_MAINT_OPTIONS  = hardening=+all
+export DEB_BUILD_MAINT_OPTIONS  = hardening=+all
 export DEB_CFLAGS_MAINT_APPEND  = -Wall
-export DEB_LDFLAGS_MAINT_APPEND = -Wl,-z,defs -Wl,-O1 -Wl,--as-needed
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,-O1 -Wl,-z,defs -Wl,--as-needed
 
 %:
-	dh $@ --with autoreconf
+	dh $@ --with gnome
 
 configure_flags += \
 	--enable-pdf \
@@ -53,13 +50,21 @@ override_dh_auto_install:
 
 override_dh_install:
 	dh_install -plibcairo2-udeb --sourcedir=debian/install/udeb
-	dh_install -Nlibcairo2-udeb --sourcedir=debian/install/deb --list-missing
+	dh_install -Nlibcairo2-udeb --sourcedir=debian/install/deb
 
-override_dh_installdocs:
-	dh_installdocs -A NEWS README AUTHORS
+override_dh_missing:
+	dh_missing --list-missing
 
 override_dh_auto_clean:
 	rm -rf debian/install/ debian/build/
+
+# The test suite is quite broken atm, so running it is not very useful.
+# Furthermore there's just one automake test that runs a ton of sub-tests,
+# that causes the single test to run for a long time without automake
+# printing any output, which causes the build to fail due to inactivity
+# on slow arches with no FPU, see https://bugs.debian.org/891547
+#override_dh_auto_test:
+#	-dh_auto_test --builddirectory=debian/build/deb
 
 override_dh_strip:
 	dh_strip -plibcairo2-udeb -pcairo-perf-utils

@@ -7,8 +7,9 @@ Section: libs
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Jeremy Bicha <jbicha@debian.org>, Laurent Bigonville <bigon@debian.org>
-Build-Depends: debhelper (>= 11),
+Build-Depends: debhelper-compat (= 12),
                gnome-pkg-tools,
+               gtk-doc-tools,
                pkg-config (>= 0.19),
                libfontconfig1-dev (>= 2.2.95),
                libfreetype6-dev (>= 2.1.10),
@@ -26,7 +27,8 @@ Build-Depends: debhelper (>= 11),
                libglib2.0-dev,
                zlib1g-dev,
                liblzo2-dev
-Standards-Version: 4.3.0
+Rules-Requires-Root: no
+Standards-Version: 4.5.1
 Vcs-Browser: https://salsa.debian.org/gnome-team/cairo
 Vcs-Git: https://salsa.debian.org/gnome-team/cairo.git
 Homepage: https://cairographics.org/

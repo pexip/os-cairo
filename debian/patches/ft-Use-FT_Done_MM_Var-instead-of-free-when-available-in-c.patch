@@ -9,7 +9,8 @@ Fixes a crash when using freetype >= 2.9
 own memory allocator, which is not compatible with system free(), making
 this a remotely triggerable denial of service or memory corruption.]
 
-Origin: upstream, commit:90e85c2493fdfa3551f202ff10282463f1e36645
+Origin: upstream, 1.17.2, commit:90e85c2493fdfa3551f202ff10282463f1e36645
+Origin: upstream, 1.16.1, commit:465ccf12866ff216adc3f0cadfd1d3eeea71ae27
 Bug: https://gitlab.freedesktop.org/cairo/cairo/merge_requests/5
 Bug-Debian: https://bugs.debian.org/916389
 Bug-CVE: CVE-2018-19876

@@ -1,2 +1,3 @@
 Tests: build
 Depends: build-essential, libcairo2-dev, pkg-config
+Restrictions: superficial

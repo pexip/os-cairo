@@ -1,8 +1,43 @@
-cairo (1.16.0-4+deb10u1) buster; urgency=medium
+cairo (1.16.0-5) unstable; urgency=medium
 
-  * CVE-2020-35492 (Closes: #CVE-2020-35492)
+  * Team upload
+  * d/patches: Add patches from upstream for CVE-2020-35492
+    (Closes: #978658)
+  * Build-Depend on gtk-doc-tools.
+    autoconf 2.70 automatically runs gtkdocize to update gtk-doc-related
+    files for packages that invoke the GTK_DOC_CHECK macro, causing FTBFS
+    with that version if gtk-doc-tools is not installed. (Closes: #978779)
+  * d/tests/build: Mark as superficial (see #904979)
+  * d/tests/build: Fix shellcheck warnings
+  * d/tests/build: Use correct compiler for proposed autopkgtest
+    cross-architecture testing support (Closes: #946371)
+  * d/shlibs.local: Generate lockstep dependencies between binary packages.
+    Upstream developers are not going to support mixing binary packages
+    of different versions from the same source package, and neither should
+    we; they all migrate to testing as a unit anyway.
+  * Add Build-Depends-Package to all symbols files
+  * Remove migration path from libcairo2-dbg older than Debian 9 'stretch'
+  * d/rules: Don't maintain shlibs version manually.
+    The symbols files make this unnecessary under most circumstances, and -V
+    (which is the default in debhelper compat level 12) generates a
+    dependency on at least the corresponding upstream version as a fallback.
+  * Move to debhelper-compat 12
+    - Drop -V from dh_makeshlibs (it is now the default)
+  * Set Rules-Requires-Root to no
+  * Wrap a long line in the 1.12.4-1 changelog entry (thanks, lintian-brush)
+  * d/patches: Move patches from upstream to beginning of series, and add
+    metadata
+  * Add Lintian override for documentation in /usr/share/gtk-doc/html.
+    See #970275 for details of why this is correct.
+  * libcairo-gobject2: Add override for library-not-linked-against-libc.
+    This library uses functions from Cairo, GLib and GObject, and does not
+    directly depend on glibc.
+  * Register with doc-base using a symlink in /usr/share/doc.
+    This silences a Lintian warning, and makes the documentation a bit more
+    discoverable.
+  * Standards-Version: 4.5.1 (no changes required)
 
- -- Moritz Mühlenhoff <jmm@debian.org>  Fri, 22 Jan 2021 00:02:52 +0100
+ -- Simon McVittie <smcv@debian.org>  Thu, 31 Dec 2020 21:39:40 +0000
 
 cairo (1.16.0-4) unstable; urgency=medium
 
@@ -345,7 +380,8 @@ cairo (1.12.4-1) experimental; urgency=low
     + debian/control:
       - Build-depend on libxext-dev.
   * debian/control:
-    + Build-depend on libpng-dev instead of libpng12-dev (Closes: #662279, #642264, #673642).
+    + Build-depend on libpng-dev instead of libpng12-dev
+      (Closes: #662279, #642264, #673642).
   * debian/control,
     debian/rules,
     debian/libcairo2.symbols:

@@ -3,6 +3,10 @@ Date: Thu, 25 Oct 2018 18:46:17 +1030
 Subject: pdf: add missing flush
 
 Issue #342
+
+Origin: upstream, upstream, 1.16.1, commit:5e34c5a9640e49dcc29e6b954c4187cfc838dbd1
+Origin: upstream, upstream, 1.17.2, commit:4c8813f0eaacc32c27126ad2296951a626300b89
+Bug: https://gitlab.freedesktop.org/cairo/cairo/-/issues/342
 ---
  src/cairo-pdf-surface.c | 5 +++++
  1 file changed, 5 insertions(+)

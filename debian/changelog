@@ -1,3 +1,9 @@
+cairo (1.16.0-4+deb10u1) buster; urgency=medium
+
+  * CVE-2020-35492 (Closes: #CVE-2020-35492)
+
+ -- Moritz Mühlenhoff <jmm@debian.org>  Fri, 22 Jan 2021 00:02:52 +0100
+
 cairo (1.16.0-4) unstable; urgency=medium
 
   * Team upload

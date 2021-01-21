@@ -4,3 +4,4 @@
 06_hurd-map-noreserve.patch
 git-pdf-add-missing-flush.patch
 ft-Use-FT_Done_MM_Var-instead-of-free-when-available-in-c.patch
+CVE-2020-35492.patch

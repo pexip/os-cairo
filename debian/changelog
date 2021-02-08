@@ -1,3 +1,15 @@
+cairo (1.16.0-4+deb10u1pexip1) pexip; urgency=medium
+
+  * New upstream release
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Mon, 08 Feb 2021 13:02:28 +0000
+
+cairo (1.16.0-4+deb10u1) buster; urgency=medium
+
+  * CVE-2020-35492 (Closes: #CVE-2020-35492)
+
+ -- Moritz Mühlenhoff <jmm@debian.org>  Fri, 22 Jan 2021 00:02:52 +0100
+
 cairo (1.16.0-4pexip3) pexip; urgency=medium
 
   * Undo maintainer breakage - modify debian/control.in for our changes too

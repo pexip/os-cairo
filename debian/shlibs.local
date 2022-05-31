@@ -1,0 +1,5 @@
+libcairo 2 libcairo2 (= ${binary:Version})
+libcairo-gobject 2 libcairo-gobject2 (= ${binary:Version})
+libcairo-script-interpreter 2 libcairo-script-interpreter2 (= ${binary:Version})
+udeb: libcairo 2 libcairo2-udeb (= ${binary:Version})
+udeb: libcairo-gobject 2 libcairo2-udeb (= ${binary:Version})

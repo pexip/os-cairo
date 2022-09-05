@@ -1,3 +1,9 @@
+cairo (1.16.0-5pexip4) pexip-bullseye; urgency=medium
+
+  * Bullseye rebuild for ARM64 inclusion
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Mon, 05 Sep 2022 10:31:18 +0100
+
 cairo (1.16.0-5pexip3) pexip-bullseye; urgency=medium
 
   * Rebuild for override changes

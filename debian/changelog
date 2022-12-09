@@ -1,3 +1,53 @@
+cairo (1.16.0-7) unstable; urgency=medium
+
+  [ Simon McVittie ]
+  * d/gbp.conf: Use upstream/1.16.x branch for upstream releases
+
+  [ Jeremy Bicha ]
+  * Add debian/upstream/metadata
+  * debian/control.in: Build-Depend on dh-sequence-gnome
+  * debian/rules: Don't override dh_missing
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 09 Dec 2022 14:43:31 -0500
+
+cairo (1.16.0-6) unstable; urgency=medium
+
+  * Team upload
+
+  [ Helmut Grohne ]
+  * Drop unused Build-Depends: libxsm-dev, xutils-dev, libxt-dev.
+    These appear to have been unused since 2006, when cairo switched to
+    preferring pkg-config and xlib.pc as its way to find Xlib.
+    (Closes: #980992)
+
+  [ Laurent Bigonville ]
+  * debian/control.in: Switch dependencies from transitional
+    libfreetype6-dev to libfreetype-dev
+
+  [ Simon McVittie ]
+  * d/control.in: Replace transitional libfontconfig1-dev with
+    libfontconfig-dev
+  * Standards-Version: 4.6.0 (no changes required)
+  * Apply fixes suggested by lintian-brush:
+    - Add missing ${misc:Depends} to Depends for libcairo2-udeb
+    - Avoid explicitly specifying -Wl,--as-needed linker flag.
+      This is the default in toolchain versions >= bullseye.
+    - Bump debhelper compat level from 12 to 13.
+      No changes to built binaries (verified with diffoscope).
+  * d/rules: Don't do feature-reduced udeb build if udebs have been
+    disabled. Thanks to Matthias Klose (Closes: part of #986153)
+  * d/rules: Disable LTO optimization.
+    The "optimize" feature area is not in Debian yet, but it's present in
+    dpkg git and was backported into Ubuntu's dpkg. According to testing in
+    Ubuntu, cairo is not ready for this yet.
+    Thanks to Matthias Klose (Closes: #986153)
+  * Canonicalize order of dependencies, etc. (wrap-and-sort -ab)
+
+  [ Debian Janitor ]
+  * Remove version constraints unnecessary since buster
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 08 May 2022 14:05:12 +0100
+
 cairo (1.16.0-5) unstable; urgency=medium
 
   * Team upload

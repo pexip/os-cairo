@@ -1,11 +1,14 @@
 #!/usr/bin/make -f
 
-export DEB_BUILD_MAINT_OPTIONS  = hardening=+all
+built_binaries := $(shell dh_listpackages)
+
+export DEB_BUILD_MAINT_OPTIONS  = hardening=+all optimize=-lto
 export DEB_CFLAGS_MAINT_APPEND  = -Wall
-export DEB_LDFLAGS_MAINT_APPEND = -Wl,-O1 -Wl,-z,defs -Wl,--as-needed
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,-O1 -Wl,-z,defs
+export DPKG_GENSYMBOLS_CHECK_LEVEL = 4
 
 %:
-	dh $@ --with gnome
+	dh $@
 
 configure_flags += \
 	--enable-pdf \
@@ -36,27 +39,32 @@ override_dh_autoreconf:
 override_dh_auto_configure:
 	dh_auto_configure --builddirectory=debian/build/deb \
 		-- $(deb_configure_flags)
+ifneq ($(filter %-udeb,$(built_binaries)),)
 	dh_auto_configure --builddirectory=debian/build/udeb \
 		-- $(udeb_configure_flags)
+endif
 
 override_dh_auto_build:
 	dh_auto_build --builddirectory=debian/build/deb
+ifneq ($(filter %-udeb,$(built_binaries)),)
 	dh_auto_build --builddirectory=debian/build/udeb
+endif
 
 override_dh_auto_install:
 	dh_auto_install --builddirectory=debian/build/deb \
 		--destdir=debian/install/deb
+ifneq ($(filter %-udeb,$(built_binaries)),)
 	dh_auto_install --builddirectory=debian/build/udeb \
 		--destdir=debian/install/udeb
+endif
 
 override_dh_install:
+ifneq ($(filter %-udeb,$(built_binaries)),)
 	dh_install -plibcairo2-udeb --sourcedir=debian/install/udeb
+endif
 	dh_install -Nlibcairo2-udeb --sourcedir=debian/install/deb
 
-override_dh_missing:
-	dh_missing --list-missing
-
-override_dh_auto_clean:
+execute_before_dh_auto_clean:
 	rm -f test/reference/bug-image-compositor.ref.png
 	rm -rf debian/install/ debian/build/
 
@@ -69,6 +77,6 @@ override_dh_auto_clean:
 #	-dh_auto_test --builddirectory=debian/build/deb
 
 override_dh_makeshlibs:
-	dh_makeshlibs -plibcairo2 --add-udeb=libcairo2-udeb -- -c4
-	dh_makeshlibs -plibcairo-gobject2 --add-udeb=libcairo2-udeb -- -c4
-	dh_makeshlibs -plibcairo-script-interpreter2 -- -c4
+	dh_makeshlibs -plibcairo2 --add-udeb=libcairo2-udeb
+	dh_makeshlibs -plibcairo-gobject2 --add-udeb=libcairo2-udeb
+	dh_makeshlibs -plibcairo-script-interpreter2

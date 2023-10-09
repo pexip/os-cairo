@@ -258,7 +258,8 @@ cairo_headers += [cairo_features_file]
 libcairo_dep = declare_dependency(link_with: libcairo,
   dependencies: deps,
   include_directories: incsrc,
-  compile_args: cairo_static_args,
+  compile_args: cairo_static_args + pthread_c_args,
+  link_args: pthread_link_args,
 )
 
 pkgmod.generate(libcairo,

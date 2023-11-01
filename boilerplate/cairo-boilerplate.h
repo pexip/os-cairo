@@ -101,6 +101,15 @@
 #define ARRAY_LENGTH(__array) ((int) (sizeof (__array) / sizeof (__array[0])))
 #endif
 
+#if defined(__APPLE__)
+     #include "TargetConditionals.h"
+     #if TARGET_OS_IOS || TARGET_OS_WATCH || TARGET_OS_TV
+         #define system(s) ((s)==NULL ? 0 : -1)
+     #endif // end iOS
+#elif defined(__ANDROID__)
+     #define system(s) ((s)==NULL ? 0 : -1)
+#endif
+
 CAIRO_BEGIN_DECLS
 
 /* A fake format we use for the flattened ARGB output of the PS and

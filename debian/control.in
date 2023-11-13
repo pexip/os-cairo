@@ -4,42 +4,76 @@ Priority: optional
 Maintainer: Pexip AS <packaging@pexip.com>
 XSBC-Pexip-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 XSBC-Pexip-Original-Uploaders: @GNOME_TEAM@
-Build-Depends: debhelper-compat (= 12),
-               gnome-pkg-tools,
+Build-Depends: debhelper-compat (= 13),
+               dh-sequence-gnome,
                gtk-doc-tools,
-               pkg-config (>= 0.19),
-               libfontconfig1-dev (>= 2.2.95),
-               libfreetype6-dev (>= 2.1.10),
-               libxrender-dev (>= 1:0.9.5-2),
-               libx11-dev (>= 2:1.3.3-2),
-               libxext-dev,
-               libpng-dev,
-               libsm-dev,
-               xutils-dev,
-               libxt-dev,
+               libfontconfig-dev (>= 2.2.95),
+               libfreetype-dev (>= 2.1.10),
+               libglib2.0-dev,
+               liblzo2-dev,
                libpixman-1-dev (>= 0.30.0),
-               libxcb1-dev (>= 1.6),
+               libpng-dev,
+               libx11-dev (>= 2:1.3.3-2),
                libxcb-render0-dev (>= 1.6),
                libxcb-shm0-dev,
-               libglib2.0-dev,
-               zlib1g-dev,
-               liblzo2-dev
+               libxcb1-dev (>= 1.6),
+               libxext-dev,
+               libxrender-dev (>= 1:0.9.5-2),
+               pkg-config (>= 0.19),
+               zlib1g-dev
 Rules-Requires-Root: no
-Standards-Version: 4.5.1
+Standards-Version: 4.6.0
 Vcs-Browser: https://salsa.debian.org/gnome-team/cairo
 Vcs-Git: https://salsa.debian.org/gnome-team/cairo.git
 Homepage: https://cairographics.org/
 XS-Pexip-Upstream: http://deb.debian.org/debian/ bookworm
 
+Package: cairo-perf-utils
+Section: misc
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Description: Cairo 2D vector graphics library performance utilities
+ Cairo is a multi-platform library providing anti-aliased
+ vector-based rendering for multiple target backends.
+ .
+ This package contains a set of utilities for capturing and replaying cairo
+ execution traces using various backends, in order to be able to measure the
+ performance of cairo for real-world applications in a reproducible way.
+
+Package: libcairo-gobject2
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Multi-Arch: same
+Description: Cairo 2D vector graphics library (GObject library)
+ Cairo is a multi-platform library providing anti-aliased
+ vector-based rendering for multiple target backends.
+ .
+ This package contains the GObject library, providing wrapper GObject types
+ for all cairo types.
+
+Package: libcairo-script-interpreter2
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Multi-Arch: same
+Description: Cairo 2D vector graphics library (script interpreter)
+ Cairo is a multi-platform library providing anti-aliased
+ vector-based rendering for multiple target backends.
+ .
+ This package contains the script interpreter for executing and manipulating
+ cairo execution traces.
+
 Package: libcairo2
 Architecture: any
-Depends: ${shlibs:Depends},
-         ${misc:Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
 Multi-Arch: same
-Breaks: weston (<< 1.5.0-3~),
+Breaks: libwebkit2gtk-3.0-25 (<< 2.4.5-2~),
         libwebkitgtk-1.0-0 (<< 2.4.5-2~),
         libwebkitgtk-3.0-0 (<< 2.4.5-2~),
-        libwebkit2gtk-3.0-25 (<< 2.4.5-2~),
+        weston (<< 1.5.0-3~)
 Description: Cairo 2D vector graphics library
  Cairo is a multi-platform library providing anti-aliased
  vector-based rendering for multiple target backends. Paths consist
@@ -61,23 +95,23 @@ Package: libcairo2-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libcairo2 (= ${binary:Version}),
-         libcairo-gobject2 (= ${binary:Version}),
+Depends: libcairo-gobject2 (= ${binary:Version}),
          libcairo-script-interpreter2 (= ${binary:Version}),
-         libfontconfig1-dev (>= 2.2.95),
-         libfreetype6-dev (>= 2.1.10),
-         libx11-dev,
-         libxrender-dev (>= 0.6),
-         libxext-dev,
+         libcairo2 (= ${binary:Version}),
+         libfontconfig-dev (>= 2.2.95),
+         libfreetype-dev (>= 2.1.10),
+         libglib2.0-dev,
+         libpixman-1-dev (>= 0.22.0),
          libpng-dev,
          libsm-dev,
-         libpixman-1-dev (>= 0.22.0),
-         libxcb1-dev (>= 1.6),
+         libx11-dev,
          libxcb-render0-dev (>= 1.6),
          libxcb-shm0-dev,
-         libglib2.0-dev,
-         ${shlibs:Depends},
-         ${misc:Depends}
+         libxcb1-dev (>= 1.6),
+         libxext-dev,
+         libxrender-dev (>= 0.6),
+         ${misc:Depends},
+         ${shlibs:Depends}
 Provides: libcairo-dev
 Suggests: libcairo2-doc
 Description: Development files for the Cairo 2D graphics library
@@ -100,47 +134,11 @@ Description: Documentation for the Cairo Multi-platform 2D graphics library
  This package contains the HTML documentation for the Cairo library
  in /usr/share/gtk-doc/html/cairo/.
 
-Package: libcairo-script-interpreter2
-Architecture: any
-Depends: ${shlibs:Depends},
-         ${misc:Depends}
-Multi-Arch: same
-Description: Cairo 2D vector graphics library (script interpreter)
- Cairo is a multi-platform library providing anti-aliased
- vector-based rendering for multiple target backends.
- .
- This package contains the script interpreter for executing and manipulating
- cairo execution traces.
-
-Package: libcairo-gobject2
-Architecture: any
-Depends: ${shlibs:Depends},
-         ${misc:Depends}
-Multi-Arch: same
-Description: Cairo 2D vector graphics library (GObject library)
- Cairo is a multi-platform library providing anti-aliased
- vector-based rendering for multiple target backends.
- .
- This package contains the GObject library, providing wrapper GObject types
- for all cairo types.
-
-Package: cairo-perf-utils
-Section: misc
-Architecture: any
-Depends: ${shlibs:Depends},
-         ${misc:Depends}
-Description: Cairo 2D vector graphics library performance utilities
- Cairo is a multi-platform library providing anti-aliased
- vector-based rendering for multiple target backends.
- .
- This package contains a set of utilities for capturing and replaying cairo
- execution traces using various backends, in order to be able to measure the
- performance of cairo for real-world applications in a reproducible way.
-
 Package: libcairo2-udeb
 Package-Type: udeb
 Section: debian-installer
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
 Description: Cairo 2D vector graphics library
  This is a udeb, or a microdeb, for the debian-installer.

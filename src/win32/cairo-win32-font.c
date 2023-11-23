@@ -160,6 +160,7 @@ _get_global_font_dc (void)
     HDC hdc;
 
     if (!hdc_tls_index) {
+    CAIRO_MUTEX_INITIALIZE ();
 	CAIRO_MUTEX_LOCK (_cairo_win32_font_dc_mutex);
 	if (!hdc_tls_index) {
 	    hdc_tls_index = TlsAlloc ();
@@ -1685,6 +1686,7 @@ _cairo_win32_font_face_hash_table_destroy (void)
 static cairo_hash_table_t *
 _cairo_win32_font_face_hash_table_lock (void)
 {
+	CAIRO_MUTEX_INITIALIZE ();
     CAIRO_MUTEX_LOCK (_cairo_win32_font_face_mutex);
 
     if (unlikely (cairo_win32_font_face_hash_table == NULL))

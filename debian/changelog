@@ -1,3 +1,9 @@
+cairo (1.16.0-7pexip2) pexip-bookworm; urgency=medium
+
+  * Bookworm build for product distribution
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Sat, 09 Dec 2023 22:52:01 +0000
+
 cairo (1.16.0-7pexip1) pexip-bookworm; urgency=medium
 
   * Initial bookworm build

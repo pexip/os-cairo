@@ -247,8 +247,8 @@ _compute_transform (cairo_win32_scaled_font_t *scaled_font,
 
 	scaled_font->logical_size =
 	    _cairo_lround (WIN32_FONT_LOGICAL_SCALE * scaled_font->y_scale);
-	scaled_font->logical_scale =
-	    WIN32_FONT_LOGICAL_SCALE * scaled_font->y_scale;
+	scaled_font->logical_scale = MAX(1.f,
+	    WIN32_FONT_LOGICAL_SCALE * scaled_font->y_scale);
     }
 
     cairo_matrix_scale (&scaled_font->logical_to_device,

@@ -351,7 +351,7 @@ endif
 
 x11_dep = dependency('x11', required: get_option('xlib'))
 xext_dep = dependency('xext', required: get_option('xlib'))
-if x11_dep.found() and xext_dep.found()
+if x11_dep.found() and xext_dep.found() and not get_option('xlib').disabled()
   feature_conf.set('CAIRO_HAS_XLIB_SURFACE', 1)
   built_features += [{
     'name': 'cairo-xlib',
@@ -417,7 +417,7 @@ xcb_dep = dependency('xcb', required: get_option('xcb'),
                      version: xcb_required_version)
 xcb_render_dep = dependency('xcb-render', required: get_option('xcb'),
                             version: xcb_render_required_version)
-if xcb_dep.found() and xcb_render_dep.found()
+if xcb_dep.found() and xcb_render_dep.found() and not get_option('xcb').disabled()
   feature_conf.set('CAIRO_HAS_XCB_SURFACE', 1)
   built_features += [{
     'name': 'cairo-xcb',

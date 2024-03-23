@@ -1,3 +1,64 @@
+cairo (1.18.0-3) unstable; urgency=medium
+
+  * Revert "Disable tests on 32-bit architectures for time_t bootstrapping"
+
+ -- Jeremy Bícha <jbicha@ubuntu.com>  Sat, 23 Mar 2024 08:43:18 -0400
+
+cairo (1.18.0-2) unstable; urgency=medium
+
+  [ Samuel Thibault ]
+  * Provide a nocheck build profile to ease bootstrapping (Closes: #1055462)
+  * Also include specture in the nocheck profile to avoid a build-dependency
+    loop while bootstrapping
+
+  [ Jeremy Bícha ]
+  * Stop using debian/control.in and dh-sequence-gnome
+  * Disable tests on 32-bit architectures for time_t bootstrapping
+
+ -- Jeremy Bícha <jbicha@ubuntu.com>  Fri, 08 Mar 2024 16:24:39 -0500
+
+cairo (1.18.0-1) unstable; urgency=medium
+
+  * New upstream release (LP: #2037186)
+  * Drop all patches: applied in new release
+  * debian/libcairo*.symbols: Add new symbols
+
+ -- Jeremy Bícha <jbicha@ubuntu.com>  Sat, 23 Sep 2023 18:39:51 -0400
+
+cairo (1.17.8-3) unstable; urgency=medium
+
+  * Replace disable test patch with an argument to dh_auto_test
+  * Release to unstable (Closes: #1041324)
+
+ -- Jeremy Bícha <jbicha@ubuntu.com>  Wed, 06 Sep 2023 08:12:07 -0400
+
+cairo (1.17.8-2) experimental; urgency=medium
+
+  * Add 2 patches to update check-def test for ARM & MIPS
+
+ -- Jeremy Bícha <jbicha@ubuntu.com>  Sun, 02 Jul 2023 10:02:22 -0400
+
+cairo (1.17.8-1) experimental; urgency=medium
+
+  * New upstream release (Closes: #958487)
+    - CVE-2019-6462 Fix infinite loop in cairo-arc.c (Closes: #929945)
+  * Build with meson
+  * Stop building cairo-perf-utils (Closes: #715709)
+  * Drop all patches except for the Hurd patch
+  * Cherry-pick patch to fix tee build
+  * debian/control.in: Build-Depend on libspectre-dev
+  * debian/control.in: Drop ancient Breaks & obsolete version restraints
+  * debian/control.in: Build-Depend on ghostscript, libpoppler-glib-dev
+    & librsvg2-dev for build tests
+  * debian/docs: README → README.md
+  * debian/libcairo2.symbols: Add new symbols
+  * Don't disable png support for the udeb
+  * Enable some build tests
+  * Temporarily disable docs test
+  * Update standards version to 4.6.2, no changes needed
+
+ -- Jeremy Bícha <jbicha@ubuntu.com>  Fri, 30 Jun 2023 19:29:07 -0400
+
 cairo (1.16.0-7) unstable; urgency=medium
 
   [ Simon McVittie ]

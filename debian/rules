@@ -7,36 +7,31 @@ export DEB_CFLAGS_MAINT_APPEND  = -Wall
 export DEB_LDFLAGS_MAINT_APPEND = -Wl,-O1 -Wl,-z,defs
 export DPKG_GENSYMBOLS_CHECK_LEVEL = 4
 
+ifneq (,$(filter nocheck,$(DEB_BUILD_PROFILES)))
+TESTS=-Dtests=disabled \
+      -Dspectre=disabled
+endif
+
 %:
 	dh $@
 
 configure_flags += \
-	--enable-pdf \
-	--enable-ps \
-	--enable-xlib \
-	--enable-png \
-	--enable-tee \
-	--disable-silent-rules \
-	--disable-maintainer-mode
+	-Dauto_features=enabled \
+	-Dsymbol-lookup=disabled \
+	-Dtee=enabled \
+	-Dquartz=disabled \
+	$(TESTS)
 
 deb_configure_flags += \
 	$(configure_flags) \
-	--enable-xlib \
-	--enable-svg \
-	--enable-xcb \
-	--enable-perf-utils \
-	--disable-gl
+	-Dgtk_doc=true
 
 udeb_configure_flags += \
 	$(configure_flags) \
-	--disable-svg \
-	--disable-xcb
-
-override_dh_autoreconf:
-	cp debian/bug-image-compositor.ref.png test/reference/
-	dh_autoreconf --as-needed
+	-Dxcb=disabled
 
 override_dh_auto_configure:
+	cp debian/bug-image-compositor.ref.png test/reference/
 	dh_auto_configure --builddirectory=debian/build/deb \
 		-- $(deb_configure_flags)
 ifneq ($(filter %-udeb,$(built_binaries)),)
@@ -68,13 +63,13 @@ execute_before_dh_auto_clean:
 	rm -f test/reference/bug-image-compositor.ref.png
 	rm -rf debian/install/ debian/build/
 
-# The test suite is quite broken atm, so running it is not very useful.
-# Furthermore there's just one automake test that runs a ton of sub-tests,
-# that causes the single test to run for a long time without automake
+# The slow test suite is quite broken atm, so running it is not very useful.
+# Furthermore there's just one test that runs a ton of sub-tests,
+# that causes the single test to run for a long time without
 # printing any output, which causes the build to fail due to inactivity
 # on slow arches with no FPU, see https://bugs.debian.org/891547
-#override_dh_auto_test:
-#	-dh_auto_test --builddirectory=debian/build/deb
+override_dh_auto_test:
+	dh_auto_test --builddirectory=debian/build/deb -- --no-suite=slow
 
 override_dh_makeshlibs:
 	dh_makeshlibs -plibcairo2 --add-udeb=libcairo2-udeb

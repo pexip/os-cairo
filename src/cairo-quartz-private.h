@@ -40,7 +40,10 @@
 
 #include "cairoint.h"
 
-#if CAIRO_HAS_QUARTZ_SURFACE
+#if !defined(CAIRO_HAS_QUARTZ_SURFACE)
+# error Cairo was not compiled with support for the quartz backend
+#endif
+
 #include "cairo-quartz.h"
 #include "cairo-surface-clipper-private.h"
 
@@ -112,11 +115,5 @@ _cairo_quartz_set_antialiasing (CGContextRef context, cairo_antialias_t antialia
 
 cairo_status_t _cairo_quartz_surface_to_png (cairo_surface_t *abstract_surface, const char *dest);
 cairo_private void _cairo_quartz_image_to_png (CGImageRef, const char *dest);
-
-#else
-
-# error Cairo was not compiled with support for the quartz backend
-
-#endif /* CAIRO_HAS_QUARTZ_SURFACE */
 
 #endif /* CAIRO_QUARTZ_PRIVATE_H */

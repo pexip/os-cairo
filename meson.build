@@ -454,11 +454,24 @@ if feature_conf.get('CAIRO_HAS_XCB_SURFACE', 0) == 1
   endif
 endif
 
-if host_machine.system() == 'darwin' and not get_option('quartz').disabled()
-  quartz_deps = dependency('appleframeworks', modules : ['CoreFoundation', 'ApplicationServices'], required: get_option('quartz'))
+if host_machine.system() in ['darwin', 'ios'] and not get_option('quartz').disabled()
+  core_graphics_dep = dependency('appleframeworks', modules : ['CoreFoundation', 'CoreGraphics'], required: get_option('quartz'))
+  core_text_dep = dependency('appleframeworks', modules : ['CoreFoundation', 'CoreGraphics', 'CoreText'], required: get_option('quartz'))
+  imageio_dep = dependency('appleframeworks', modules : ['ImageIO'], required: get_option('quartz'))
+  application_services_dep = dependency('appleframeworks', modules : ['ApplicationServices'], required:  get_option('quartz'))
 
-  if quartz_deps.found()
-    deps += [quartz_deps]
+  if application_services_dep.found()
+    deps += [application_services_dep]
+    feature_conf.set('CAIRO_HAS_APPLICATION_SERVICES', 1)
+  endif
+
+  if imageio_dep.found()
+    deps += [imageio_dep]
+    feature_conf.set('CAIRO_HAS_IMAGEIO', 1)
+  endif
+
+  if core_graphics_dep.found()
+    deps += [core_graphics_dep]
 
     feature_conf.set('CAIRO_HAS_QUARTZ_SURFACE', 1)
     feature_conf.set('CAIRO_HAS_QUARTZ_IMAGE_SURFACE', 1)
@@ -467,25 +480,30 @@ if host_machine.system() == 'darwin' and not get_option('quartz').disabled()
       {
         'name': 'cairo-quartz',
         'description': 'Quartz surface backend',
-        'deps': quartz_deps,
+        'deps': core_graphics_dep,
       },
       {
         'name': 'cairo-quartz-image',
         'description': 'Quartz Image surface backend',
-        'deps': quartz_deps,
-      }]
+        'deps': core_graphics_dep,
+      }] 
+  endif
+
+  if core_text_dep.found()
     compiler = meson.get_compiler('c')
-    if compiler.has_function('CTFontDrawGlyphs', prefix: '#include <ApplicationServices/ApplicationServices.h>',
-                             dependencies: quartz_deps)
+    if compiler.has_function('CTFontDrawGlyphs', prefix: '#include <CoreText/CoreText.h>',
+                             dependencies: core_text_dep)
+      deps += [core_text_dep]
       built_features += [
            {
                'name': 'cairo-quartz-font',
                'description': 'Quartz font backend',
-               'deps': quartz_deps,
+               'deps': core_text_dep,
            }]
       feature_conf.set('CAIRO_HAS_QUARTZ_FONT', 1)
     endif
   endif
+
 endif
 
 if host_machine.system() == 'windows'

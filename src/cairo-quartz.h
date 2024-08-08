@@ -38,11 +38,19 @@
 
 #include "cairo.h"
 
-#if CAIRO_HAS_QUARTZ_SURFACE
+#if !defined (CAIRO_HAS_QUARTZ_SURFACE) && !defined(CAIRO_HAS_QUARTZ_FONT)
+#error Cairo was not compiled with support for the quartz backend
+#endif
 
+#if defined(CAIRO_HAS_APPLICATION_SERVICES)
 #include <ApplicationServices/ApplicationServices.h>
+#endif
+
+#include <CoreText/CoreText.h>
 
 CAIRO_BEGIN_DECLS
+
+#if defined(CAIRO_HAS_QUARTZ_SURFACE)
 
 cairo_public cairo_surface_t *
 cairo_quartz_surface_create (cairo_format_t format,
@@ -57,26 +65,26 @@ cairo_quartz_surface_create_for_cg_context (CGContextRef cgContext,
 cairo_public CGContextRef
 cairo_quartz_surface_get_cg_context (cairo_surface_t *surface);
 
-#if CAIRO_HAS_QUARTZ_FONT
+#endif /* CAIRO_HAS_QUARTZ_SURFACE */
 
 /*
  * Quartz font support
  */
 
+#if defined(CAIRO_HAS_QUARTZ_FONT)
+
 cairo_public cairo_font_face_t *
 cairo_quartz_font_face_create_for_cgfont (CGFontRef font);
+
+#endif /* CAIRO_HAS_QUARTZ_FONT */
+
+#if defined(CAIRO_HAS_APPLICATION_SERVICES)
 
 cairo_public cairo_font_face_t *
 cairo_quartz_font_face_create_for_atsu_font_id (ATSUFontID font_id);
 
-#endif /* CAIRO_HAS_QUARTZ_FONT */
+#endif /* CAIRO_HAS_APPLICATION_SERVICES */
 
 CAIRO_END_DECLS
-
-#else
-
-# error Cairo was not compiled with support for the quartz backend
-
-#endif /* CAIRO_HAS_QUARTZ_SURFACE */
 
 #endif /* CAIRO_QUARTZ_H */

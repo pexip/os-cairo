@@ -36,6 +36,12 @@
 
 #include "cairoint.h"
 
+#if defined(CAIRO_HAS_APPLICATION_SERVICES)
+#include <Carbon/Carbon.h>
+#endif
+
+#include <CoreGraphics/CoreGraphics.h>
+
 #include "cairo-image-surface-inline.h"
 #include "cairo-quartz-image.h"
 #include "cairo-quartz-private.h"
@@ -307,7 +313,13 @@ cairo_quartz_image_surface_create (cairo_surface_t *surface)
 	colorspace = _cairo_quartz_create_color_space (context);
     }
     else {
+
+#if defined(CAIRO_HAS_APPLICATION_SERVICES)
 	colorspace = CGDisplayCopyColorSpace (CGMainDisplayID ());
+#else
+    // FIXME: provide a colorspace! 
+    colorspace = NULL;
+#endif
     }
 
     bitinfo |= format == CAIRO_FORMAT_ARGB32 ? kCGImageAlphaPremultipliedFirst : kCGImageAlphaNoneSkipFirst;

@@ -36,6 +36,8 @@
 
 #include "cairoint.h"
 
+#include <ImageIO/ImageIO.h>
+
 #include "cairo-quartz-private.h"
 #include "cairo-quartz-image.h"
 
@@ -200,8 +202,11 @@ _cairo_quartz_create_color_space (CGContextRef context)
         if (color_space)
             return color_space;
     }
+
+#if defined(CAIRO_HAS_APPLICATION_SERVICES)
     if (!color_space)
         color_space =  CGDisplayCopyColorSpace (CGMainDisplayID ());
+#endif
 
     if (!color_space)
         color_space = CGColorSpaceCreateDeviceRGB ();

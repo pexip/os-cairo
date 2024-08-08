@@ -38,9 +38,10 @@
 
 #include "cairo.h"
 
-#if CAIRO_HAS_QUARTZ_IMAGE_SURFACE
+#if !defined(CAIRO_HAS_QUARTZ_IMAGE_SURFACE)
+# error Cairo was not compiled with support for the quartz-image backend
+#endif
 
-#include <Carbon/Carbon.h>
 
 CAIRO_BEGIN_DECLS
 
@@ -52,8 +53,5 @@ cairo_quartz_image_surface_get_image (cairo_surface_t *surface);
 
 CAIRO_END_DECLS
 
-#else  /* CAIRO_HAS_QUARTZ_IMAGE_SURFACE */
-# error Cairo was not compiled with support for the quartz-image backend
-#endif /* CAIRO_HAS_QUARTZ_IMAGE_SURFACE */
 
 #endif /* CAIRO_QUARTZ_IMAGE_H */

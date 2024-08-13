@@ -30,7 +30,7 @@ Standards-Version: 4.6.0
 Vcs-Browser: https://salsa.debian.org/gnome-team/cairo
 Vcs-Git: https://salsa.debian.org/gnome-team/cairo.git
 Homepage: https://cairographics.org/
-XS-Pexip-Upstream: http://deb.debian.org/debian/ bookworm
+XS-Pexip-Upstream: http://deb.debian.org/debian/ trixie
 
 Package: cairo-perf-utils
 Section: misc

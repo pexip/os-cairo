@@ -262,9 +262,11 @@ libcairo_dep = declare_dependency(link_with: libcairo,
   link_args: pthread_link_args,
 )
 
-pkgmod.generate(libcairo,
+pkgmod.generate(name: 'cairo',
   description: 'Multi-platform 2D graphics library',
-  subdirs: [meson.project_name()],
+  libraries: libcairo_dep,
+  subdirs: 'cairo',
+  version: meson.project_version(),
 )
 
 meson.override_dependency('cairo', libcairo_dep)

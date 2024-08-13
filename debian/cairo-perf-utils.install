@@ -1,4 +1,0 @@
-usr/bin/cairo-analyse-trace
-usr/bin/cairo-perf*
-usr/bin/cairo-trace
-usr/lib/*/cairo/libcairo-trace.so*

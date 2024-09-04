@@ -1,0 +1,29 @@
+From 19cd3c0ad06576d008029c1a99680be9bc5a05e9 Mon Sep 17 00:00:00 2001
+From: Tulio Beloqui <tulio@pexip.com>
+Date: Mon, 18 Dec 2023 14:01:15 +0100
+Subject: [PATCH 4/9] cairo-win32-font: fixed division by zero
+
+We need to be sure scaled_font->logical_scale never gets zero, as that
+is used later for division.
+---
+ src/win32/cairo-win32-font.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/win32/cairo-win32-font.c b/src/win32/cairo-win32-font.c
+index b8a18fb4e..1e0baaf86 100644
+--- a/src/win32/cairo-win32-font.c
++++ b/src/win32/cairo-win32-font.c
+@@ -247,8 +247,8 @@ _compute_transform (cairo_win32_scaled_font_t *scaled_font,
+ 
+ 	scaled_font->logical_size =
+ 	    _cairo_lround (WIN32_FONT_LOGICAL_SCALE * scaled_font->y_scale);
+-	scaled_font->logical_scale =
+-	    WIN32_FONT_LOGICAL_SCALE * scaled_font->y_scale;
++	scaled_font->logical_scale = MAX(1.f,
++	    WIN32_FONT_LOGICAL_SCALE * scaled_font->y_scale);
+     }
+ 
+     cairo_matrix_scale (&scaled_font->logical_to_device,
+-- 
+2.46.0
+

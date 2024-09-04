@@ -1,0 +1,40 @@
+From 695ba16245e7bc386b6fda6f16b80a7dafd60e7a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?H=C3=A5vard=20Graff?= <havard.graff@gmail.com>
+Date: Sat, 13 Jan 2024 12:06:12 +0100
+Subject: [PATCH 5/9] meson: expose lzo as a meson option
+
+---
+ meson.build       | 4 ++--
+ meson_options.txt | 1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 9100152ee..0ae1330ea 100644
+--- a/meson.build
++++ b/meson.build
+@@ -195,8 +195,8 @@ else
+   endif
+ endif
+ 
+-lzo_dep = dependency('lzo2', required: false)
+-if lzo_dep.found()
++lzo_dep = dependency('lzo2', required: get_option('lzo'))
++if lzo_dep.found() and not get_option('lzo').disabled()
+   conf.set('HAVE_LZO', 1)
+ endif
+ 
+diff --git a/meson_options.txt b/meson_options.txt
+index f481ef3ea..8aa6814bb 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -16,6 +16,7 @@ option('zlib', type : 'feature', value : 'auto') # script, ps, pdf, xml surfaces
+ option('tests', type : 'feature', value : 'auto')
+ 
+ # Util deps
++option('lzo', type : 'feature', value : 'auto')
+ option('gtk2-utils', type : 'feature', value : 'disabled')
+ 
+ # Misc deps
+-- 
+2.46.0
+

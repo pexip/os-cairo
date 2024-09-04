@@ -1,0 +1,40 @@
+From f905aa25f74b5982bd16695ab9d5b4744b2a129b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?H=C3=A5vard=20Graff?= <havard.graff@gmail.com>
+Date: Sat, 13 Jan 2024 12:07:59 +0100
+Subject: [PATCH 6/9] meson: make meson-option 'disabled' work for x11 and xbc
+
+Currently it would error out if you have it 'enabled' and it was not found,
+but the opposite, that it *is* found, but you have it 'disabled' is
+not supported.
+
+Since you might not want to pull in these dependencies, making 'disabled'
+work is desirable.
+---
+ meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 0ae1330ea..ab222713f 100644
+--- a/meson.build
++++ b/meson.build
+@@ -351,7 +351,7 @@ endif
+ 
+ x11_dep = dependency('x11', required: get_option('xlib'))
+ xext_dep = dependency('xext', required: get_option('xlib'))
+-if x11_dep.found() and xext_dep.found()
++if x11_dep.found() and xext_dep.found() and not get_option('xlib').disabled()
+   feature_conf.set('CAIRO_HAS_XLIB_SURFACE', 1)
+   built_features += [{
+     'name': 'cairo-xlib',
+@@ -417,7 +417,7 @@ xcb_dep = dependency('xcb', required: get_option('xcb'),
+                      version: xcb_required_version)
+ xcb_render_dep = dependency('xcb-render', required: get_option('xcb'),
+                             version: xcb_render_required_version)
+-if xcb_dep.found() and xcb_render_dep.found()
++if xcb_dep.found() and xcb_render_dep.found() and not get_option('xcb').disabled()
+   feature_conf.set('CAIRO_HAS_XCB_SURFACE', 1)
+   built_features += [{
+     'name': 'cairo-xcb',
+-- 
+2.46.0
+

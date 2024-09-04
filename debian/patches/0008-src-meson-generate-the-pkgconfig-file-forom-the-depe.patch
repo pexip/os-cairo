@@ -1,0 +1,32 @@
+From 8b23443194adfc7c546bcc8ca3fc2307ed6b6cc1 Mon Sep 17 00:00:00 2001
+From: Tulio Beloqui <tulio@pexip.com>
+Date: Tue, 13 Aug 2024 16:37:38 +0200
+Subject: [PATCH 8/9] src/meson: generate the pkgconfig file forom the
+ dependency
+
+Fixes exporting the correct Cflags, required for static builds!
+---
+ src/meson.build | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 73783f75b..062b818b1 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -262,9 +262,11 @@ libcairo_dep = declare_dependency(link_with: libcairo,
+   link_args: pthread_link_args,
+ )
+ 
+-pkgmod.generate(libcairo,
++pkgmod.generate(name: 'cairo',
+   description: 'Multi-platform 2D graphics library',
+-  subdirs: [meson.project_name()],
++  libraries: libcairo_dep,
++  subdirs: 'cairo',
++  version: meson.project_version(),
+ )
+ 
+ meson.override_dependency('cairo', libcairo_dep)
+-- 
+2.46.0
+

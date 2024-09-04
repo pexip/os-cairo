@@ -1,0 +1,301 @@
+From c38277611cb0a334a01e8dc57ff11988db450922 Mon Sep 17 00:00:00 2001
+From: Tulio Beloqui <tulio@pexip.com>
+Date: Thu, 8 Aug 2024 16:03:37 +0200
+Subject: [PATCH 9/9] quartz: introducing support for ios
+
+---
+ meson.build                      | 38 +++++++++++++++++++++++---------
+ src/cairo-quartz-font.c          | 11 +++++++++
+ src/cairo-quartz-image-surface.c | 12 ++++++++++
+ src/cairo-quartz-image.h         |  8 +++----
+ src/cairo-quartz-private.h       | 11 ++++-----
+ src/cairo-quartz-surface.c       |  5 +++++
+ src/cairo-quartz.h               | 26 ++++++++++++++--------
+ 7 files changed, 80 insertions(+), 31 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index ab222713f..7c08f5aa0 100644
+--- a/meson.build
++++ b/meson.build
+@@ -454,11 +454,24 @@ if feature_conf.get('CAIRO_HAS_XCB_SURFACE', 0) == 1
+   endif
+ endif
+ 
+-if host_machine.system() == 'darwin' and not get_option('quartz').disabled()
+-  quartz_deps = dependency('appleframeworks', modules : ['CoreFoundation', 'ApplicationServices'], required: get_option('quartz'))
++if host_machine.system() in ['darwin', 'ios'] and not get_option('quartz').disabled()
++  core_graphics_dep = dependency('appleframeworks', modules : ['CoreFoundation', 'CoreGraphics'], required: get_option('quartz'))
++  core_text_dep = dependency('appleframeworks', modules : ['CoreFoundation', 'CoreGraphics', 'CoreText'], required: get_option('quartz'))
++  imageio_dep = dependency('appleframeworks', modules : ['ImageIO'], required: get_option('quartz'))
++  application_services_dep = dependency('appleframeworks', modules : ['ApplicationServices'], required:  get_option('quartz'))
++
++  if application_services_dep.found()
++    deps += [application_services_dep]
++    feature_conf.set('CAIRO_HAS_APPLICATION_SERVICES', 1)
++  endif
++
++  if imageio_dep.found()
++    deps += [imageio_dep]
++    feature_conf.set('CAIRO_HAS_IMAGEIO', 1)
++  endif
+ 
+-  if quartz_deps.found()
+-    deps += [quartz_deps]
++  if core_graphics_dep.found()
++    deps += [core_graphics_dep]
+ 
+     feature_conf.set('CAIRO_HAS_QUARTZ_SURFACE', 1)
+     feature_conf.set('CAIRO_HAS_QUARTZ_IMAGE_SURFACE', 1)
+@@ -467,25 +480,30 @@ if host_machine.system() == 'darwin' and not get_option('quartz').disabled()
+       {
+         'name': 'cairo-quartz',
+         'description': 'Quartz surface backend',
+-        'deps': quartz_deps,
++        'deps': core_graphics_dep,
+       },
+       {
+         'name': 'cairo-quartz-image',
+         'description': 'Quartz Image surface backend',
+-        'deps': quartz_deps,
+-      }]
++        'deps': core_graphics_dep,
++      }] 
++  endif
++
++  if core_text_dep.found()
+     compiler = meson.get_compiler('c')
+-    if compiler.has_function('CTFontDrawGlyphs', prefix: '#include <ApplicationServices/ApplicationServices.h>',
+-                             dependencies: quartz_deps)
++    if compiler.has_function('CTFontDrawGlyphs', prefix: '#include <CoreText/CoreText.h>',
++                             dependencies: core_text_dep)
++      deps += [core_text_dep]
+       built_features += [
+            {
+                'name': 'cairo-quartz-font',
+                'description': 'Quartz font backend',
+-               'deps': quartz_deps,
++               'deps': core_text_dep,
+            }]
+       feature_conf.set('CAIRO_HAS_QUARTZ_FONT', 1)
+     endif
+   endif
++
+ endif
+ 
+ if host_machine.system() == 'windows'
+diff --git a/src/cairo-quartz-font.c b/src/cairo-quartz-font.c
+index 0c868e026..c93b78787 100644
+--- a/src/cairo-quartz-font.c
++++ b/src/cairo-quartz-font.c
+@@ -65,7 +65,10 @@
+ 
+ /* These are private functions */
+ static bool (*CGContextGetAllowsFontSmoothingPtr) (CGContextRef) = NULL;
++
++#if defined(CAIRO_HAS_APPLICATION_SERVICES)
+ static ATSFontRef (*FMGetATSFontRefFromFontPtr) (FMFont iFont) = NULL;
++#endif
+ 
+ static cairo_bool_t _cairo_quartz_font_symbol_lookup_done = FALSE;
+ /* Cairo's transformations assume a unit-scaled font. */
+@@ -92,7 +95,9 @@ quartz_font_ensure_symbols(void)
+     CGContextGetAllowsFontSmoothingPtr =
+ 	dlsym (RTLD_DEFAULT, "CGContextGetAllowsFontSmoothing");
+ 
++#if defined(CAIRO_HAS_APPLICATION_SERVICES)
+     FMGetATSFontRefFromFontPtr = dlsym(RTLD_DEFAULT, "FMGetATSFontRefFromFont");
++#endif
+ 
+     _cairo_quartz_font_symbol_lookup_done = TRUE;
+ }
+@@ -792,6 +797,10 @@ _cairo_quartz_scaled_font_get_ct_font (cairo_scaled_font_t *abstract_font)
+ 	}
+ 
+ }
++
++
++#if defined(CAIRO_HAS_APPLICATION_SERVICES)
++
+ /*
+  * compat with old ATSUI backend
+  */
+@@ -838,3 +847,5 @@ cairo_atsui_font_face_create_for_atsu_font_id (ATSUFontID font_id)
+ {
+     return cairo_quartz_font_face_create_for_atsu_font_id (font_id);
+ }
++
++#endif /* CAIRO_HAS_APPLICATION_SERVICES */
+\ No newline at end of file
+diff --git a/src/cairo-quartz-image-surface.c b/src/cairo-quartz-image-surface.c
+index 9056a7b68..252b0691d 100644
+--- a/src/cairo-quartz-image-surface.c
++++ b/src/cairo-quartz-image-surface.c
+@@ -36,6 +36,12 @@
+ 
+ #include "cairoint.h"
+ 
++#if defined(CAIRO_HAS_APPLICATION_SERVICES)
++#include <Carbon/Carbon.h>
++#endif
++
++#include <CoreGraphics/CoreGraphics.h>
++
+ #include "cairo-image-surface-inline.h"
+ #include "cairo-quartz-image.h"
+ #include "cairo-quartz-private.h"
+@@ -307,7 +313,13 @@ cairo_quartz_image_surface_create (cairo_surface_t *surface)
+ 	colorspace = _cairo_quartz_create_color_space (context);
+     }
+     else {
++
++#if defined(CAIRO_HAS_APPLICATION_SERVICES)
+ 	colorspace = CGDisplayCopyColorSpace (CGMainDisplayID ());
++#else
++    // FIXME: provide a colorspace! 
++    colorspace = NULL;
++#endif
+     }
+ 
+     bitinfo |= format == CAIRO_FORMAT_ARGB32 ? kCGImageAlphaPremultipliedFirst : kCGImageAlphaNoneSkipFirst;
+diff --git a/src/cairo-quartz-image.h b/src/cairo-quartz-image.h
+index 0dd5abb4f..991bae968 100644
+--- a/src/cairo-quartz-image.h
++++ b/src/cairo-quartz-image.h
+@@ -38,9 +38,10 @@
+ 
+ #include "cairo.h"
+ 
+-#if CAIRO_HAS_QUARTZ_IMAGE_SURFACE
++#if !defined(CAIRO_HAS_QUARTZ_IMAGE_SURFACE)
++# error Cairo was not compiled with support for the quartz-image backend
++#endif
+ 
+-#include <Carbon/Carbon.h>
+ 
+ CAIRO_BEGIN_DECLS
+ 
+@@ -52,8 +53,5 @@ cairo_quartz_image_surface_get_image (cairo_surface_t *surface);
+ 
+ CAIRO_END_DECLS
+ 
+-#else  /* CAIRO_HAS_QUARTZ_IMAGE_SURFACE */
+-# error Cairo was not compiled with support for the quartz-image backend
+-#endif /* CAIRO_HAS_QUARTZ_IMAGE_SURFACE */
+ 
+ #endif /* CAIRO_QUARTZ_IMAGE_H */
+diff --git a/src/cairo-quartz-private.h b/src/cairo-quartz-private.h
+index bdfdf8c2b..c2780623d 100644
+--- a/src/cairo-quartz-private.h
++++ b/src/cairo-quartz-private.h
+@@ -40,7 +40,10 @@
+ 
+ #include "cairoint.h"
+ 
+-#if CAIRO_HAS_QUARTZ_SURFACE
++#if !defined(CAIRO_HAS_QUARTZ_SURFACE)
++# error Cairo was not compiled with support for the quartz backend
++#endif
++
+ #include "cairo-quartz.h"
+ #include "cairo-surface-clipper-private.h"
+ 
+@@ -113,10 +116,4 @@ _cairo_quartz_set_antialiasing (CGContextRef context, cairo_antialias_t antialia
+ cairo_status_t _cairo_quartz_surface_to_png (cairo_surface_t *abstract_surface, const char *dest);
+ cairo_private void _cairo_quartz_image_to_png (CGImageRef, const char *dest);
+ 
+-#else
+-
+-# error Cairo was not compiled with support for the quartz backend
+-
+-#endif /* CAIRO_HAS_QUARTZ_SURFACE */
+-
+ #endif /* CAIRO_QUARTZ_PRIVATE_H */
+diff --git a/src/cairo-quartz-surface.c b/src/cairo-quartz-surface.c
+index 6da1b6ffa..6b2a403f2 100644
+--- a/src/cairo-quartz-surface.c
++++ b/src/cairo-quartz-surface.c
+@@ -36,6 +36,8 @@
+ 
+ #include "cairoint.h"
+ 
++#include <ImageIO/ImageIO.h>
++
+ #include "cairo-quartz-private.h"
+ #include "cairo-quartz-image.h"
+ 
+@@ -200,8 +202,11 @@ _cairo_quartz_create_color_space (CGContextRef context)
+         if (color_space)
+             return color_space;
+     }
++
++#if defined(CAIRO_HAS_APPLICATION_SERVICES)
+     if (!color_space)
+         color_space =  CGDisplayCopyColorSpace (CGMainDisplayID ());
++#endif
+ 
+     if (!color_space)
+         color_space = CGColorSpaceCreateDeviceRGB ();
+diff --git a/src/cairo-quartz.h b/src/cairo-quartz.h
+index 9e11e876f..eb33fd39b 100644
+--- a/src/cairo-quartz.h
++++ b/src/cairo-quartz.h
+@@ -38,12 +38,20 @@
+ 
+ #include "cairo.h"
+ 
+-#if CAIRO_HAS_QUARTZ_SURFACE
++#if !defined (CAIRO_HAS_QUARTZ_SURFACE) && !defined(CAIRO_HAS_QUARTZ_FONT)
++#error Cairo was not compiled with support for the quartz backend
++#endif
+ 
++#if defined(CAIRO_HAS_APPLICATION_SERVICES)
+ #include <ApplicationServices/ApplicationServices.h>
++#endif
++
++#include <CoreText/CoreText.h>
+ 
+ CAIRO_BEGIN_DECLS
+ 
++#if defined(CAIRO_HAS_QUARTZ_SURFACE)
++
+ cairo_public cairo_surface_t *
+ cairo_quartz_surface_create (cairo_format_t format,
+                              unsigned int width,
+@@ -57,26 +65,26 @@ cairo_quartz_surface_create_for_cg_context (CGContextRef cgContext,
+ cairo_public CGContextRef
+ cairo_quartz_surface_get_cg_context (cairo_surface_t *surface);
+ 
+-#if CAIRO_HAS_QUARTZ_FONT
++#endif /* CAIRO_HAS_QUARTZ_SURFACE */
+ 
+ /*
+  * Quartz font support
+  */
+ 
+-cairo_public cairo_font_face_t *
+-cairo_quartz_font_face_create_for_cgfont (CGFontRef font);
++#if defined(CAIRO_HAS_QUARTZ_FONT)
+ 
+ cairo_public cairo_font_face_t *
+-cairo_quartz_font_face_create_for_atsu_font_id (ATSUFontID font_id);
++cairo_quartz_font_face_create_for_cgfont (CGFontRef font);
+ 
+ #endif /* CAIRO_HAS_QUARTZ_FONT */
+ 
+-CAIRO_END_DECLS
++#if defined(CAIRO_HAS_APPLICATION_SERVICES)
+ 
+-#else
++cairo_public cairo_font_face_t *
++cairo_quartz_font_face_create_for_atsu_font_id (ATSUFontID font_id);
+ 
+-# error Cairo was not compiled with support for the quartz backend
++#endif /* CAIRO_HAS_APPLICATION_SERVICES */
+ 
+-#endif /* CAIRO_HAS_QUARTZ_SURFACE */
++CAIRO_END_DECLS
+ 
+ #endif /* CAIRO_QUARTZ_H */
+-- 
+2.46.0
+

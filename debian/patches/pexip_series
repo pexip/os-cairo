@@ -1,0 +1,9 @@
+0001-meson-include-pthread_link_args-in-the-libcairo_dep.patch
+0002-boilerplate-add-definition-of-system-for-some-Apple-.patch
+0003-cairo-win32-font-added-calls-to-CAIRO_MUTEX_INITIALI.patch
+0004-cairo-win32-font-fixed-division-by-zero.patch
+0005-meson-expose-lzo-as-a-meson-option.patch
+0006-meson-make-meson-option-disabled-work-for-x11-and-xb.patch
+0007-util-cairo-script-change-include-for-lzo2a.h.patch
+0008-src-meson-generate-the-pkgconfig-file-forom-the-depe.patch
+0009-quartz-introducing-support-for-ios.patch

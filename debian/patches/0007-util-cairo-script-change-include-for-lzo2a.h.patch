@@ -1,0 +1,43 @@
+From 62d5f5715ba6c96bcc7c732bb8ca3200ab4d6538 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?H=C3=A5vard=20Graff?= <havard.graff@gmail.com>
+Date: Sat, 13 Jan 2024 12:09:29 +0100
+Subject: [PATCH 7/9] util/cairo-script: change include for lzo2a.h
+
+The current pkg-config file for lzo sets the include path directly
+to where the header file is located, so prefixing it with lzo only works
+if the include path is set to the equivalent of /usr/include, which
+might not be the case.
+---
+ util/cairo-script/cairo-script-operators.c | 2 +-
+ util/cairo-script/cairo-script-scanner.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/util/cairo-script/cairo-script-operators.c b/util/cairo-script/cairo-script-operators.c
+index 21fba5cc7..a5eca6ffc 100644
+--- a/util/cairo-script/cairo-script-operators.c
++++ b/util/cairo-script/cairo-script-operators.c
+@@ -60,7 +60,7 @@
+ #endif
+ 
+ #if HAVE_LZO
+-#include <lzo/lzo2a.h>
++#include <lzo2a.h>
+ #endif
+ 
+ #ifdef HAVE_MMAP
+diff --git a/util/cairo-script/cairo-script-scanner.c b/util/cairo-script/cairo-script-scanner.c
+index fe6512dd9..0b55f0dc5 100644
+--- a/util/cairo-script/cairo-script-scanner.c
++++ b/util/cairo-script/cairo-script-scanner.c
+@@ -46,7 +46,7 @@
+ #include <zlib.h>
+ 
+ #if HAVE_LZO
+-#include <lzo/lzo2a.h>
++#include <lzo2a.h>
+ #endif
+ 
+ #define DEBUG_SCAN 0
+-- 
+2.46.0
+

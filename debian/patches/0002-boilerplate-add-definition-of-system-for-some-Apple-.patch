@@ -1,0 +1,33 @@
+From b8cbef13746f0d3166f6cc7d2baf1d4d1201b533 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?H=C3=A5vard=20Graff?= <havard.graff@gmail.com>
+Date: Wed, 1 Nov 2023 19:19:07 +0100
+Subject: [PATCH 2/9] boilerplate: add definition of "system()" for some Apple
+ and Android
+
+---
+ boilerplate/cairo-boilerplate.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/boilerplate/cairo-boilerplate.h b/boilerplate/cairo-boilerplate.h
+index 736534eaf..3ecc8de4a 100644
+--- a/boilerplate/cairo-boilerplate.h
++++ b/boilerplate/cairo-boilerplate.h
+@@ -101,6 +101,15 @@
+ #define ARRAY_LENGTH(__array) ((int) (sizeof (__array) / sizeof (__array[0])))
+ #endif
+ 
++#if defined(__APPLE__)
++     #include "TargetConditionals.h"
++     #if TARGET_OS_IOS || TARGET_OS_WATCH || TARGET_OS_TV
++         #define system(s) ((s)==NULL ? 0 : -1)
++     #endif // end iOS
++#elif defined(__ANDROID__)
++     #define system(s) ((s)==NULL ? 0 : -1)
++#endif
++
+ CAIRO_BEGIN_DECLS
+ 
+ /* A fake format we use for the flattened ARGB output of the PS and
+-- 
+2.46.0
+

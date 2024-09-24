@@ -1,3 +1,18 @@
+cairo (1.18.2-2) unstable; urgency=high
+
+  [ Miguel Bernal Marin ]
+  * Cherry-pick fix for printing & exporting of PDFs (Closes: #1082114)
+
+ -- Jeremy Bícha <jbicha@ubuntu.com>  Tue, 24 Sep 2024 16:56:29 -0400
+
+cairo (1.18.2-1) unstable; urgency=medium
+
+  * New upstream release (LP: #2078971)
+  * Bump minimum FreeType
+  * Bump Standards Version to 4.7.0
+
+ -- Jeremy Bícha <jbicha@ubuntu.com>  Wed, 04 Sep 2024 14:45:59 -0400
+
 cairo (1.18.0-3) unstable; urgency=medium
 
   * Revert "Disable tests on 32-bit architectures for time_t bootstrapping"

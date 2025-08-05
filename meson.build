@@ -786,6 +786,10 @@ if have_ld_preload and zlib_dep.found() and conf.get('CAIRO_HAS_REAL_PTHREAD', 0
   conf.set('CAIRO_HAS_TRACE', 1)
 endif
 
+if host_machine.system() != 'android' and conf.get('CAIRO_HAS_DLSYM', 0) == 1 and cc.has_header('execinfo.h')
+  conf.set('CAIRO_HAS_MALLOC_STATS', 1)
+endif
+
 rt_dep = cc.find_library('rt', required: false)
 have_shm = false
 if rt_dep.found() and cc.has_function('shm_open', dependencies: [rt_dep])

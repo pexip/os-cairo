@@ -201,11 +201,21 @@ public:
     static RefPtr<IWICImagingFactory> Instance()
     {
 	if (!mFactoryInstance) {
-	    CoInitialize(NULL);
-	    CoCreateInstance(CLSID_WICImagingFactory,
-			     NULL,
-			     CLSCTX_INPROC_SERVER,
-			     IID_PPV_ARGS(&mFactoryInstance));
+	    /* The factory is cached for the life of the process and used by
+	     * whichever thread next draws a colour glyph, so it must not belong
+	     * to the calling thread. An apartment initialised for that thread
+	     * goes when the thread exits, and if no other apartment is left, COM
+	     * unloads the factory's DLL and the cached pointer dangles. Keep the
+	     * process's multithreaded apartment for as long as the factory
+	     * instead, which also lets a thread that has not initialised COM
+	     * create the factory there. */
+	    CO_MTA_USAGE_COOKIE cookie;
+	    if (SUCCEEDED(CoIncrementMTAUsage(&cookie))) {
+		CoCreateInstance(CLSID_WICImagingFactory,
+				 NULL,
+				 CLSCTX_INPROC_SERVER,
+				 IID_PPV_ARGS(&mFactoryInstance));
+	    }
 	}
 	return mFactoryInstance;
     }
